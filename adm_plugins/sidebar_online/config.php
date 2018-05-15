@@ -44,4 +44,4 @@ $plg_link_target = '_self';
 // Should the header of the plugin be displayed
 // 1 = (Default) Headline is displayed
 // 0 = Headline is not displayed
-$plg_show_headline = 1;
+$plg_show_headline = 0;

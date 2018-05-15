@@ -20,7 +20,7 @@ $plg_show_date_end = 1;
 // Soll ein Vorschau-Text der Ankündigung gezeigt werden?
 // 0 = keine Voranzeige
 // 70 = Anzahl Zeichen des Vorschau-Textes
-$plg_dates_show_preview = 70;
+$plg_dates_show_preview = 0;
 
 // If this option is set to true (1) than the full content of the
 // description will be shown. Also images and other html content.
@@ -39,7 +39,7 @@ $plg_kal_cat =  array('all');
 // Soll die Überschrift des Plugins angezeigt werden
 // 1 = (Default) Überschrift wird angezeigt
 // 0 = Überschrift wird nicht angezeigt
-$plg_show_headline = 1;
+$plg_show_headline = 0;
 
 // Angabe der Prefix-Url für den Aufruf in Joomla
 // wenn keine Angabe erfolgt dann wird die Standard-URL von Admidio verwendet

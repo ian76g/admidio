@@ -39,7 +39,7 @@
 #plgCalendarTable td a.date:hover {
     display: block;
     line-height: 14pt;
-    background: #FF9C00;
+    background: #a06300;
     color: #000000;
     font-weight: bold;
     text-decoration:none;
@@ -55,7 +55,7 @@
 #plgCalendarTable td a.geb:hover {
     display: block;
     line-height: 14pt;
-    background: #82C226;
+    background: #ff9400;
     color: #000000;
     font-weight: bold;
     text-decoration:none;
