@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<step>
+<update>
     <step id="10">UPDATE %PREFIX%_user_fields SET usf_name_intern = 'STREET' WHERE usf_name_intern = 'ADDRESS'</step>
     <step id="20">UPDATE %PREFIX%_user_fields SET usf_name = 'SYS_STREET' WHERE usf_name_intern = 'STREET' AND usf_name = 'SYS_ADDRESS'</step>
     <step id="30">UPDATE %PREFIX%_user_fields SET usf_name = 'SYS_STREET' WHERE usf_name_intern = 'STREET' AND usf_name = 'Adresse'</step>

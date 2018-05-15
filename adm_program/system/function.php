@@ -600,14 +600,7 @@ function admFuncShowCreateChangeInfoByName($userNameCreated, $timestampCreate, $
 
         if ($userNameCreated === '')
         {
-            if($userIdCreated === 1)
-            {
-                $userNameCreated = $gL10n->get('SYS_SYSTEM');                
-            }
-            else
-            {
-                $userNameCreated = $gL10n->get('SYS_DELETED_USER');
-            }
+            $userNameCreated = $gL10n->get('SYS_DELETED_USER');
         }
 
         // if valid login and a user id is given than create a link to the profile of this user
@@ -627,14 +620,7 @@ function admFuncShowCreateChangeInfoByName($userNameCreated, $timestampCreate, $
 
         if ($userNameEdited === '')
         {
-            if($userIdEdited === 1)
-            {
-                $userNameEdited = $gL10n->get('SYS_SYSTEM');                
-            }
-            else
-            {
-                $userNameEdited = $gL10n->get('SYS_DELETED_USER');
-            }
+            $userNameEdited = $gL10n->get('SYS_DELETED_USER');
         }
 
         // if valid login and a user id is given than create a link to the profile of this user
