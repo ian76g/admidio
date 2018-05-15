@@ -207,6 +207,8 @@ class HtmlPage
 
         // add admidio css file at last because there the user can redefine all css
         $this->addCssFile(THEME_URL.'/css/admidio.css');
+        $this->addCssFile(ADMIDIO_URL.'/adm_plugins/birthday/birthday.css');
+        $this->addCssFile(ADMIDIO_URL.'/adm_plugins/calendar/calendar.css');
 
         // if print mode is set then add a print specific css file
         if ($this->printMode)
@@ -477,7 +479,7 @@ class HtmlPage
             </script>';
         }
 
-        if ((bool) $gSettingsManager->get('system_cookie_note'))
+        if ($gSettingsManager->has('system_cookie_note') && $gSettingsManager->getBool('system_cookie_note'))
         {
             if ($gSetCookieForDomain)
             {
