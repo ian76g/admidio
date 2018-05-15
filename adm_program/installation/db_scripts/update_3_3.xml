@@ -80,7 +80,7 @@
     <step id="575" database="mysql" error="ignore">ALTER TABLE %PREFIX%_users DROP INDEX ak_usr_login_name, ADD INDEX %PREFIX%_idx_usr_login_name (usr_login_name)</step>
     <step id="580" database="mysql" error="ignore">ALTER TABLE %PREFIX%_organizations DROP INDEX ak_shortname</step>
     <step id="590">CREATE TABLE %PREFIX%_menu
-        (
+            (
             men_id                      integer unsigned    NOT NULL    AUTO_INCREMENT,
             men_men_id_parent           integer unsigned,
             men_com_id                  integer unsigned,
@@ -93,10 +93,11 @@
             men_url                     varchar(255),
             men_icon                    varchar(2000),
             PRIMARY KEY (men_id)
-        )
-        ENGINE = InnoDB
-        DEFAULT character SET = utf8
-        COLLATE = utf8_unicode_ci</step>
+            )
+            ENGINE = InnoDB
+            DEFAULT character SET = utf8
+            COLLATE = utf8_unicode_ci
+    </step>
     <step id="600">CREATE INDEX %PREFIX%_idx_men_men_id_parent ON %PREFIX%_menu (men_men_id_parent)</step>
     <step id="610">ALTER TABLE %PREFIX%_menu ADD CONSTRAINT %PREFIX%_fk_men_men_parent FOREIGN KEY (men_men_id_parent) REFERENCES %PREFIX%_menu (men_id) ON DELETE SET NULL ON UPDATE RESTRICT</step>
     <step id="620">ALTER TABLE %PREFIX%_menu ADD CONSTRAINT %PREFIX%_fk_men_com_id FOREIGN KEY (men_com_id) REFERENCES %PREFIX%_components (com_id) ON DELETE RESTRICT ON UPDATE RESTRICT</step>
