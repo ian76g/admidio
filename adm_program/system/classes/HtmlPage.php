@@ -113,7 +113,7 @@ class HtmlPage
         $this->setHeadline($headline);
 
         $this->addCssFile(ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/bootstrap/css/bootstrap.css');
-        $this->addJavascriptFile(ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/jquery/jquery.js');
+        $this->addJavascriptFile(ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/jquery/dist/jquery.js');
         $this->addJavascriptFile(ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/bootstrap/js/bootstrap.js');
         $this->addJavascriptFile(ADMIDIO_URL . '/adm_program/system/js/common_functions.js');
     }
@@ -126,7 +126,7 @@ class HtmlPage
     {
         if (!in_array($cssFile, $this->cssFiles, true))
         {
-            if (admStrStartsWith($cssFile, 'http'))
+            if (StringUtils::strStartsWith($cssFile, 'http'))
             {
                 $this->cssFiles[] = $cssFile;
             }
@@ -162,7 +162,7 @@ class HtmlPage
     {
         if (!in_array($jsFile, $this->jsFiles, true))
         {
-            if (admStrStartsWith($jsFile, 'http'))
+            if (StringUtils::strStartsWith($jsFile, 'http'))
             {
                 $this->jsFiles[] = $jsFile;
             }
@@ -421,10 +421,9 @@ class HtmlPage
     private function getFileContent($filename)
     {
         global $gLogger, $gL10n, $gDb, $gCurrentSession, $gCurrentOrganization, $gCurrentUser;
-        global $gValidLogin, $gProfileFields, $gHomepage, $gDbType, $gSettingsManager;
-        global $g_root_path, $gPreferences;
+        global $gValidLogin, $gProfileFields, $gHomepage, $gSettingsManager;
 
-        $filePath = THEME_ADMIDIO_PATH . '/' . $filename;
+        $filePath = THEME_PATH . '/' . $filename;
         if (!is_file($filePath))
         {
             $gLogger->error('THEME: Theme file "' . $filename . '" not found!', array('filePath' => $filePath));
@@ -455,12 +454,6 @@ class HtmlPage
         {
             $headerContent .= '<link rel="stylesheet" type="text/css" href="' . $cssFile . '" />';
         }
-
-        // add some special scripts so that ie8 could better understand the Bootstrap 3 framework
-        $headerContent .= '<!--[if lt IE 9]>
-            <script src="' . ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/html5shiv/html5shiv.min.js"></script>
-            <script src="' . ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/respond/respond.min.js"></script>
-        <![endif]-->';
 
         // add javascript files to page
         foreach ($this->jsFiles as $jsFile)
@@ -754,31 +747,20 @@ class HtmlPage
     }
 
     /**
-     * This method send the whole html code of the page to the browser. Call this method
-     * if you have finished your page layout.
-     * @param bool $directOutput If set to **true** (default) the html page will be directly send
-     *                           to the browser. If set to **false** the html will be returned.
-     * @return string|void If $directOutput is set to **false** this method will return the html code of the page.
+     * This method send the whole html code of the page to the browser.
+     * Call this method if you have finished your page layout.
      */
-    public function show($directOutput = true)
+    public function show()
     {
         $this->addMainFilesAndContent();
 
-        $html = '<!DOCTYPE html><html>';
-        $html .= $this->getHtmlHeader();
-        $html .= $this->getHtmlBody();
-        $html .= '</html>';
-
         // now show the complete html of the page
-        if ($directOutput)
-        {
-            header('Content-type: text/html; charset=utf-8');
-            echo $html;
-        }
-        else
-        {
-            return $html;
-        }
+        header('Content-type: text/html; charset=utf-8');
+
+        echo '<!DOCTYPE html><html>';
+        echo $this->getHtmlHeader();
+        echo $this->getHtmlBody();
+        echo '</html>';
     }
 
     /**

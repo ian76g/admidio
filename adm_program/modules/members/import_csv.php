@@ -78,7 +78,6 @@ for($i = $startRow, $iMax = count($_SESSION['file_lines']); $i < $iMax; ++$i)
     {
         // Hochkomma und Spaces entfernen
         $columnValue = trim(strip_tags(str_replace('"', '', $columnValue)));
-        $columnValueToLower = admStrToLower($columnValue);
 
         // nun alle Userfelder durchgehen und schauen, bei welchem
         // die entsprechende Dateispalte ausgewaehlt wurde
@@ -109,19 +108,12 @@ for($i = $startRow, $iMax = count($_SESSION['file_lines']); $i < $iMax; ++$i)
                     switch ($field->getValue('usf_type'))
                     {
                         case 'CHECKBOX':
-                            if($columnValueToLower === 'j'
-                                || $columnValueToLower === admStrToLower($gL10n->get('SYS_YES'))
-                                || $columnValueToLower === 'y'
-                                || $columnValueToLower === 'yes'
-                                || $columnValueToLower === '1')
+                            $columnValueToLower = StringUtils::strToLower($columnValue);
+                            if(in_array($columnValueToLower, array('y', 'yes', '1', 'j', StringUtils::strToLower($gL10n->get('SYS_YES'))), true))
                             {
                                 $user->setValue($usfNameIntern, '1');
                             }
-                            if($columnValueToLower === 'n'
-                                || $columnValueToLower === admStrToLower($gL10n->get('SYS_NO'))
-                                || $columnValueToLower === 'no'
-                                || $columnValueToLower === '0'
-                                || $columnValue === '')
+                            if(in_array($columnValueToLower, array('n', 'no', '0', '', StringUtils::strToLower($gL10n->get('SYS_NO'))), true))
                             {
                                 $user->setValue($usfNameIntern, '0');
                             }
@@ -134,7 +126,7 @@ for($i = $startRow, $iMax = count($_SESSION['file_lines']); $i < $iMax; ++$i)
 
                             foreach($arrListValues as $value)
                             {
-                                if(admStrToLower($columnValue) === admStrToLower(trim($arrListValues[$position])))
+                                if(StringUtils::strToLower($columnValue) === StringUtils::strToLower(trim($arrListValues[$position])))
                                 {
                                     // if col_value is text than save position if text is equal to text of position
                                     $user->setValue($usfNameIntern, $position);
@@ -148,7 +140,6 @@ for($i = $startRow, $iMax = count($_SESSION['file_lines']); $i < $iMax; ++$i)
                             }
                             break;
                         case 'EMAIL':
-                            $columnValue = admStrToLower($columnValue);
                             if(strValidCharacters($columnValue, 'email'))
                             {
                                 $user->setValue($usfNameIntern, substr($columnValue, 0, 255));

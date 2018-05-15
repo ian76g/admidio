@@ -62,7 +62,7 @@ class FunctionClass
     {
         if ($tplFolder === '')
         {
-            $tplFolder = THEME_ADMIDIO_PATH . '/ecard_templates/';
+            $tplFolder = THEME_PATH . '/ecard_templates/';
         }
 
         if (!is_file($tplFolder . $tplFilename))
@@ -191,10 +191,10 @@ class FunctionClass
                     THEME_URL   => THEME_ADMIDIO_PATH,
                     ADMIDIO_URL => ADMIDIO_PATH
                 );
-                $imgServerPath = admStrMultiReplace($match, $replaces);
+                $imgServerPath = StringUtils::strMultiReplace($match, $replaces);
 
                 // wird das Bild aus photo_show.php generiert, dann den uebergebenen Pfad zum Bild einsetzen
-                if (admStrContains($imgServerPath, 'photo_show.php'))
+                if (StringUtils::strContains($imgServerPath, 'photo_show.php'))
                 {
                     $imgServerPath = $photoServerPath;
                 }
@@ -205,7 +205,7 @@ class FunctionClass
                 $imgType = $imagePathInfo['extension'];
 
                 // das zu versendende eigentliche Bild, muss noch auf das entsprechende Format angepasst werden
-                if (admStrContains($match, 'photo_show.php'))
+                if (StringUtils::strContains($match, 'photo_show.php'))
                 {
                     $imgName = 'picture.' . $imgType;
                     $imgNameIntern = substr(md5(uniqid($imgName . time(), true)), 0, 8) . '.' . $imgType;

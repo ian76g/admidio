@@ -335,7 +335,6 @@ function admFuncVariableIsValid(array $array, $variableName, $datatype, array $o
     $optionsAll     = array_replace($optionsDefault, $options);
 
     $errorMessage = '';
-    $datatype = strtolower($datatype);
     $value = null;
 
     // set default value for each datatype if no value is given and no value was required
@@ -381,9 +380,7 @@ function admFuncVariableIsValid(array $array, $variableName, $datatype, array $o
 
     // check if parameter has a valid value
     // do a strict check with in_array because the function don't work properly
-    if ($optionsAll['validValues'] !== null
-    && !in_array(admStrToUpper($value), $optionsAll['validValues'], true)
-    && !in_array(admStrToLower($value), $optionsAll['validValues'], true))
+    if ($optionsAll['validValues'] !== null && !in_array($value, $optionsAll['validValues'], true))
     {
         $errorMessage = $gL10n->get('SYS_INVALID_PAGE_VIEW');
     }
@@ -423,12 +420,6 @@ function admFuncVariableIsValid(array $array, $variableName, $datatype, array $o
         case 'bool':
         case 'boolean':
             $valid = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            // Bug workaround PHP <5.4.8
-            // https://bugs.php.net/bug.php?id=49510
-            if ($valid === null && ($value === null || $value === false || $value === ''))
-            {
-                $valid = false;
-            }
             if ($valid === null)
             {
                 $errorMessage = $gL10n->get('SYS_INVALID_PAGE_VIEW');
@@ -719,8 +710,7 @@ function admFuncGetDirectoryEntries($directory, $searchType = 'file')
 function admFuncCheckUrl($url)
 {
     // Homepage url have to start with "http://"
-    if (strpos(admStrToLower($url), 'http://')  !== 0
-    &&  strpos(admStrToLower($url), 'https://') !== 0)
+    if (!StringUtils::strStartsWith($url, 'http://', false) && !StringUtils::strStartsWith($url, 'https://', false))
     {
         $url = 'http://' . $url;
     }
@@ -742,12 +732,6 @@ function admFuncCheckUrl($url)
  */
 function noHTML($input, $encoding = 'UTF-8')
 {
-    // backwards compatibility for PHP-Version < 5.4
-    if (!defined('ENT_HTML5'))
-    {
-        return htmlentities($input, ENT_QUOTES, $encoding);
-    }
-
     return htmlentities($input, ENT_QUOTES | ENT_HTML5, $encoding);
 }
 
@@ -763,15 +747,7 @@ function safeUrl($path, array $params = array(), $anchor = '', $escape = false)
     $paramsText = '';
     if (count($params) > 0)
     {
-        // backwards compatibility for PHP-Version < 5.4
-        if (defined('PHP_QUERY_RFC3986'))
-        {
-            $paramsText = '?' . http_build_query($params, '', '&', PHP_QUERY_RFC3986);
-        }
-        else
-        {
-            $paramsText = '?' . http_build_query($params, '', '&');
-        }
+        $paramsText = '?' . http_build_query($params, '', '&', PHP_QUERY_RFC3986);
     }
 
     $anchorText = '';
@@ -844,16 +820,6 @@ function admRedirect($url, $statusCode = 303)
 }
 
 /**
- * Get an string with question marks that are comma separated.
- * @param array<int,mixed> $valuesArray An array with the values that should be replaced with question marks
- * @return string Question marks string
- */
-function replaceValuesArrWithQM(array $valuesArray)
-{
-    return implode(',', array_fill(0, count($valuesArray), '?'));
-}
-
-/**
  * Calculates and formats the execution time
  * @param float $startTime The start time
  * @return string Returns the formated execution time
@@ -863,54 +829,4 @@ function getExecutionTime($startTime)
     $stopTime = microtime(true);
 
     return number_format(($stopTime - $startTime) * 1000, 6, '.', '') . ' ms';
-}
-
-/**
- * Berechnung der Maximalerlaubten Dateiuploadgröße in Byte
- * @deprecated 3.3.0:4.0.0 "admFuncMaxUploadSize()" is a typo. Use "PhpIniUtils::getUploadMaxSize()" instead.
- * @return int
- */
-function admFuncMaxUploadSize()
-{
-    global $gLogger;
-
-    $gLogger->warning('DEPRECATED: "admFuncMaxUploadSize()" is deprecated, use "PhpIniUtils::getUploadMaxSize()" instead!');
-
-    return PhpIniUtils::getUploadMaxSize();
-}
-
-/**
- * @deprecated 3.3.0:4.0.0 "admFuncGetBytesFromSize()" is deprecated, use "FileSystemUtils::getHumanReadableBytes()" instead.
- * @param string $data
- * @param bool   $decimalMulti
- * @return int
- */
-function admFuncGetBytesFromSize($data, $decimalMulti = false)
-{
-    global $gLogger;
-
-    $gLogger->warning('DEPRECATED: "admFuncGetBytesFromSize()" is deprecated, use "FileSystemUtils::getHumanReadableBytes()" instead!');
-
-    $value = (float) substr(trim($data), 0, -1);
-    $unit  = strtoupper(substr(trim($data), -1));
-
-    $multi = 1024;
-    if ($decimalMulti)
-    {
-        $multi = 1000;
-    }
-
-    switch ($unit)
-    {
-        case 'T':
-            $value *= $multi;
-        case 'G':
-            $value *= $multi;
-        case 'M':
-            $value *= $multi;
-        case 'K':
-            $value *= $multi;
-    }
-
-    return (int) $value;
 }

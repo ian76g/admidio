@@ -81,7 +81,7 @@ class ConditionParser
         global $gSettingsManager;
 
         // if last char is Y or J then user searches for age
-        $lastDateChar = admStrToUpper(substr($date, -1));
+        $lastDateChar = strtoupper(substr($date, -1));
 
         if ($lastDateChar === 'J' || $lastDateChar === 'Y')
         {
@@ -154,9 +154,7 @@ class ConditionParser
      */
     private static function isDateSearch($columnType, $sourceCondition)
     {
-        $sourceCondition = admStrToUpper($sourceCondition);
-
-        return $columnType === 'date' && (admStrContains($sourceCondition, 'J') || admStrContains($sourceCondition, 'Y'));
+        return $columnType === 'date' && (StringUtils::strContains($sourceCondition, 'J', false) || StringUtils::strContains($sourceCondition, 'Y', false));
     }
 
     /**
@@ -447,16 +445,16 @@ class ConditionParser
     {
         global $gL10n;
 
-        $this->srcCond = admStrToUpper(trim($sourceCondition));
+        $this->srcCond = StringUtils::strToUpper(trim($sourceCondition));
 
         $replaces = array(
             '*' => '%',
             // valid 'not null' is '#'
-            admStrToUpper($gL10n->get('SYS_NOT_EMPTY')) => ' # ',
-            ' NOT NULL '                                => ' # ',
+            StringUtils::strToUpper($gL10n->get('SYS_NOT_EMPTY')) => ' # ',
+            ' NOT NULL '                                          => ' # ',
             // valid 'null' is '_'
-            admStrToUpper($gL10n->get('SYS_EMPTY')) => ' _ ',
-            ' NULL '                                => ' _ ',
+            StringUtils::strToUpper($gL10n->get('SYS_EMPTY')) => ' _ ',
+            ' NULL '                                          => ' _ ',
             // valid 'is not' is '!'
             '{}'     => ' ! ',
             '!='     => ' ! ',
@@ -481,7 +479,7 @@ class ConditionParser
             ' ODER ' => ' | ',
             '||'     => ' | '
         );
-        $this->srcCond = admStrMultiReplace($this->srcCond, $replaces);
+        $this->srcCond = StringUtils::strMultiReplace($this->srcCond, $replaces);
 
         return $this->srcCond;
     }

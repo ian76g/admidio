@@ -31,7 +31,7 @@ like member lists, event manager, guestbook, photo album or download area.
 
 ## Installation
 
-You can install Admidio on your webspace if the script language [PHP](https://secure.php.net/) in version 5.3.7
+You can install Admidio on your webspace if the script language [PHP](https://secure.php.net/) in version 5.6.0
 or higher is available. Admidio also needs a [MySQL](https://www.mysql.com/) (version 5.0 or higher) or
 [PostgreSQL](https://www.postgresql.org/) (version 9.0 or higher) database to run.
 
@@ -105,7 +105,6 @@ and sharing great software.
 - [CKEditor](http://ckeditor.com/): Javascript-Editor
 - [Cookie Consent](https://cookieconsent.insites.com/): The most popular solution to the EU cookie law
 - [Datatables](https://www.datatables.net/): Table plugin for jQuery
-- [Html5Shiv](https://github.com/aFarkas/html5shiv): Enable Html5 for older browsers
 - [htmLawed](http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed/): PHP code to purify & filter HTML
 - [Icon Bibliothek famfamfam, Silk Icons](http://www.famfamfam.com/): Icon Bibliothek
 - [James Heinrich](http://www.silisoftware.com/): backupDB
@@ -114,10 +113,8 @@ and sharing great software.
 - [Lightbox](https://ashleydw.github.io/lightbox/): Lightbox for bootstrap 3
 - [Moment](http://momentjs.com/): Parse, validate, manipulate, and display dates in JavaScript
 - [NobleCount](https://tpgblog.com/NobleCount/): NobleCount… for a more ‘proper’ count of the characters remaining.
-- [password_compat](https://github.com/ircmaxell/password_compat/): Compatibility with the password_* functions that ship with PHP 5.5
 - [phpass](http://www.openwall.com/phpass/): Portable PHP password hashing framework
 - [PHPMailer](https://github.com/PHPMailer/PHPMailer): Email sending library for PHP
-- [Respond](https://github.com/scottjehl/Respond): Polyfill for min/max-width CSS3 Media Queries
 - [SecurImage](https://www.phpcaptcha.org/): PHP CAPTCHA script for generating complex images and CAPTCHA codes to protect forms from spam and abuse.
 - [Select2](https://select2.github.io/): jQuery replacement for select boxes
 - [Tango Desktop Project](http://tango.freedesktop.org/): Icon Bibliothek Tango

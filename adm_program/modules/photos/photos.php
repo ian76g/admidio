@@ -506,7 +506,6 @@ for ($x = $getStart; $x <= $getStart + $gSettingsManager->getInt('photo_albums_p
             }
 
             $page->addHtml('
-                    </div>
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -517,6 +516,8 @@ for ($x = $getStart; $x <= $getStart + $gSettingsManager->getInt('photo_albums_p
                         <div class="col-xs-12 col-sm-12 col-md-6 admidio-album-card-description">
             ');
 
+            $page->addHtml($form->show());
+
             $form = new HtmlForm('form_album_'.$childPhotoAlbum->getValue('pho_id'), null, $page, array('type' => 'vertical'));
             $form->addStaticControl('pho_date', $gL10n->get('SYS_DATE'), $albumDate);
             $form->addStaticControl('pho_count', $gL10n->get('SYS_PHOTOS'), $childPhotoAlbum->countImages());
@@ -524,7 +525,6 @@ for ($x = $getStart; $x <= $getStart + $gSettingsManager->getInt('photo_albums_p
             {
                 $form->addStaticControl('pho_photographer', $gL10n->get('PHO_PHOTOGRAPHER'), $childPhotoAlbum->getValue('pho_photographers'));
             }
-            $page->addHtml($form->show(false));
             $page->addHtml('</div></div>');
 
             // Notice for users with foto edit rights that the folder of the album doesn't exists

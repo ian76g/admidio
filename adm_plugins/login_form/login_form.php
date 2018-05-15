@@ -80,7 +80,7 @@ echo '<div id="plugin_'. $pluginFolder. '" class="admidio-plugin-content">';
 
 if($gValidLogin)
 {
-    if($plg_link_target === '' || admStrStartsWith($plg_link_target, '_'))
+    if($plg_link_target === '' || StringUtils::strStartsWith($plg_link_target, '_'))
     {
         $jsContentNextPage = 'self.location.href = \''. ADMIDIO_URL. '/adm_program/system/logout.php\';';
     }
@@ -151,7 +151,7 @@ if($gValidLogin)
     $form->addStaticControl('plg_active_since', $gL10n->get('PLG_LOGIN_ACTIVE_SINCE'), $gCurrentSession->getValue('ses_begin', $gSettingsManager->getString('system_time')));
     $form->addStaticControl('plg_last_login', $gL10n->get('PLG_LOGIN_LAST_LOGIN'), $lastLogin);
     $form->addStaticControl('plg_number_of_logins', $gL10n->get('PLG_LOGIN_NUMBER_OF_LOGINS'), $gCurrentUser->getValue('usr_number_login').$htmlUserRank);
-    $form->show();
+    echo $form->show();
 
     echo '<div class="btn-group-vertical" role="group">';
 
@@ -207,7 +207,7 @@ else
     }
 
     $form->addSubmitButton('next_page', $gL10n->get('SYS_LOGIN'), array('icon' => $iconCode));
-    $form->show();
+    echo $form->show();
 
     echo '<div class="btn-group-vertical" role="group">';
 

@@ -104,10 +104,9 @@ class HtmlFormInstallation extends HtmlForm
     /**
      * This method will create the whole html installation/update code. It will show the headline,
      * text and the configured form. If no modus is set the installation modus will be set here.
-     * @param bool $directOutput This is only used for compatibility to show method of parent class HtmlForm
      * @return string Return the html code of the form.
      */
-    public function show($directOutput = true)
+    public function show()
     {
         // if no modus set then set installation modus
         if ($this->title === '')
@@ -137,7 +136,7 @@ class HtmlFormInstallation extends HtmlForm
             <link rel="stylesheet" type="text/css" href="'.ADMIDIO_URL.FOLDER_LIBS_CLIENT.'/bootstrap/css/bootstrap.min.css" />
             <link rel="stylesheet" type="text/css" href="layout/admidio.css" />
 
-            <script type="text/javascript" src="'.ADMIDIO_URL.FOLDER_LIBS_CLIENT.'/jquery/jquery.min.js"></script>
+            <script type="text/javascript" src="'.ADMIDIO_URL.FOLDER_LIBS_CLIENT.'/jquery/dist/jquery.min.js"></script>
             <script type="text/javascript" src="'.ADMIDIO_URL.FOLDER_LIBS_CLIENT.'/bootstrap/js/bootstrap.min.js"></script>
             <script type="text/javascript" src="'.ADMIDIO_URL.'/adm_program/system/js/common_functions.js"></script>
 
@@ -162,7 +161,7 @@ class HtmlFormInstallation extends HtmlForm
                     $html .= '<p>' . $this->descriptionText . '</p>';
                 }
                 // now show the configured form
-                $html .= parent::show(false);
+                $html .= parent::show();
             $html .= '</div>
         </body>
         </html>';

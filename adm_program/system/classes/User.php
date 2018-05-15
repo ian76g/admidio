@@ -543,7 +543,7 @@ class User extends TableAccess
             throw new AdmException($gL10n->get('SYS_LOGIN_MAX_INVALID_LOGIN'));
         }
 
-        if (!PasswordHashing::verify($password, $this->getValue('usr_password')))
+        if (!PasswordUtils::verify($password, $this->getValue('usr_password')))
         {
             $incorrectLoginMessage = $this->handleIncorrectPasswordLogin();
 
@@ -852,7 +852,7 @@ class User extends TableAccess
                                     ON rrd_ror_id = ror_id
                                  WHERE ror_name_intern = \'category_edit\'
                                    AND rrd_object_id   = cat_id
-                                   AND rrd_rol_id IN ('.replaceValuesArrWithQM($rolIdParams).') )
+                                   AND rrd_rol_id IN ('.Database::getQmForValues($rolIdParams).') )
                     )';
         }
 
@@ -931,7 +931,7 @@ class User extends TableAccess
                                   ON rrd_ror_id = ror_id
                                WHERE ror_name_intern = \'category_view\'
                                  AND rrd_object_id   = cat_id
-                                 AND rrd_rol_id IN ('.replaceValuesArrWithQM($rolIdParams).') )
+                                 AND rrd_rol_id IN ('.Database::getQmForValues($rolIdParams).') )
                       OR NOT EXISTS (SELECT 1
                                        FROM ' . TBL_ROLES_RIGHTS . '
                                  INNER JOIN ' . TBL_ROLES_RIGHTS_DATA . '
@@ -1074,7 +1074,7 @@ class User extends TableAccess
     {
         global $gSettingsManager;
 
-        if (!admStrStartsWith($columnName, 'usr_'))
+        if (!StringUtils::strStartsWith($columnName, 'usr_'))
         {
             return $this->mProfileFieldsData->getValue($columnName, $format);
         }
@@ -1518,7 +1518,7 @@ class User extends TableAccess
     {
         global $gLogger, $installedDbVersion;
 
-        // only check for administrator role if version > 3.1 because before it was webmaster role
+        // Deprecated: Fallback for updates from v3.0 and v3.1
         if (version_compare($installedDbVersion, '3.2', '>='))
         {
             $administratorColumn = 'rol_administrator';
@@ -1655,7 +1655,7 @@ class User extends TableAccess
     {
         global $gLogger;
 
-        if (!PasswordHashing::needsRehash($this->getValue('usr_password')))
+        if (!PasswordUtils::needsRehash($this->getValue('usr_password')))
         {
             return false;
         }
@@ -1804,7 +1804,7 @@ class User extends TableAccess
             $cost = (int) $gSettingsManager->getInt('system_hashing_cost');
         }
 
-        $newPasswordHash = PasswordHashing::hash($newPassword, $gPasswordHashAlgorithm, array('cost' => $cost));
+        $newPasswordHash = PasswordUtils::hash($newPassword, $gPasswordHashAlgorithm, array('cost' => $cost));
 
         if ($newPasswordHash === false)
         {
@@ -1855,7 +1855,7 @@ class User extends TableAccess
         global $gCurrentUser, $gSettingsManager;
 
         // users data from adm_users table
-        if (admStrStartsWith($columnName, 'usr_'))
+        if (StringUtils::strStartsWith($columnName, 'usr_'))
         {
             // don't change user password; use $user->setPassword()
             if ($columnName === 'usr_password' || $columnName === 'usr_new_password')
@@ -2053,34 +2053,5 @@ class User extends TableAccess
     public function editWeblinksRight()
     {
         return $this->checkRolesRight('rol_weblinks');
-    }
-
-    /**
-     * Checks if the user is assigned to the role **Administrator**
-     * @deprecated 3.2.0:4.0.0 Use Method isAdministrator() instead
-     * @return bool Returns **true** if the user is a member of the role **Administrator**
-     * @see User#isAdministrator
-     */
-    public function isWebmaster()
-    {
-        global $gLogger;
-
-        $gLogger->warning('DEPRECATED: "$user->isWebmaster()" is deprecated, use "$user->isAdministrator()" instead!');
-
-        return $this->isAdministrator();
-    }
-
-    /**
-     * returns true if a column of user table or profile fields has changed
-     * @deprecated 3.3.0:4.0.0 Use Method hasColumnsValueChanged() instead
-     * @return bool
-     */
-    public function columnsValueChanged()
-    {
-        global $gLogger;
-
-        $gLogger->warning('DEPRECATED: "$user->columnsValueChanged()" is deprecated, use "$user->hasColumnsValueChanged()" instead!');
-
-        return $this->hasColumnsValueChanged();
     }
 }

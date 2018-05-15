@@ -406,7 +406,7 @@ class HtmlForm extends HtmlFormBasic
         if ($optionsAll['icon'] !== '')
         {
             // create html for icon
-            if (admStrStartsWith(admStrToLower($optionsAll['icon']), 'http') && strValidCharacters($optionsAll['icon'], 'url'))
+            if (StringUtils::strStartsWith($optionsAll['icon'], 'http', false) && strValidCharacters($optionsAll['icon'], 'url'))
             {
                 $htmlIcon = '<img class="admidio-icon-info" src="' . $optionsAll['icon'] . '" title="' . $label . '" alt="' . $label . '" />';
             }
@@ -1738,7 +1738,7 @@ class HtmlForm extends HtmlFormBasic
         $sql = 'SELECT DISTINCT cat_id, cat_org_id, cat_name, cat_default, cat_sequence
                   FROM ' . TBL_CATEGORIES . '
                        ' . $sqlTables . '
-                 WHERE cat_id IN (' . replaceValuesArrWithQM($catIdParams) . ')
+                 WHERE cat_id IN (' . Database::getQmForValues($catIdParams) . ')
                    AND cat_type = ? -- $categoryType
                        ' . $sqlConditions . '
               ORDER BY cat_sequence ASC';
@@ -1854,30 +1854,13 @@ class HtmlForm extends HtmlFormBasic
      */
     protected function closeControlStructure($helpTextId = '')
     {
-        global $gL10n, $gLogger;
+        global $gL10n;
 
         $parameters = array();
         if (is_array($helpTextId))
         {
-            if (is_array($helpTextId[1]))
-            {
-                $parameters = $helpTextId[1];
-                $helpTextId = $helpTextId[0];
-            }
-            // backwards compatibility
-            else
-            {
-                // TODO deprecated: Remove in Admidio 4.0
-                $helpTextIds = '\'' . implode('\', \'', $helpTextId) . '\'';
-                $parameters = $helpTextId;
-                $helpTextId = array_shift($parameters);
-                $paramsString = '\'' . implode('\', \'', $parameters) . '\'';
-
-                $gLogger->warning(
-                    'DEPRECATED: "$htmlForm->closeControlStructure(' . $helpTextIds . ')" is deprecated, use "$htmlForm->closeControlStructure(\'' . $helpTextId . '\', array(' . $paramsString . ')" instead!',
-                    array('helpTextId' => $helpTextId, 'parameters' => $parameters)
-                );
-            }
+            $parameters = $helpTextId[1];
+            $helpTextId = $helpTextId[0];
         }
 
         if ($helpTextId !== '')
@@ -1926,19 +1909,13 @@ class HtmlForm extends HtmlFormBasic
     /**
      * Add a small help icon to the form at the current element which shows the
      * translated text of the text-id on mouseover or when you click on the icon.
-     * @param string|string[] $textId    A unique text id from the translation xml files that should be shown e.g. SYS_DATA_CATEGORY_GLOBAL.
-     * @param string          $parameter If you need an additional parameter for the text you can set this parameter.
+     * @param string $textId    A unique text id from the translation xml files that should be shown e.g. SYS_DATA_CATEGORY_GLOBAL.
+     * @param string $parameter If you need an additional parameter for the text you can set this parameter.
      * @return string Return a html snippet that contains a help icon with a link to a popup box that shows the message.
      */
     public static function getHelpTextIcon($textId, $parameter = null)
     {
         global $gL10n, $gProfileFields;
-
-        // backwards compatibility
-        if (is_array($textId))
-        {
-            list($textId, $parameter) = $textId;
-        }
 
         if ($parameter === null)
         {
@@ -2020,7 +1997,7 @@ class HtmlForm extends HtmlFormBasic
         if ($icon !== '')
         {
             // create html for icon
-            if (admStrStartsWith(admStrToLower($icon), 'http') && strValidCharacters($icon, 'url'))
+            if (StringUtils::strStartsWith($icon, 'http', false) && strValidCharacters($icon, 'url'))
             {
                 $htmlIcon = '<img class="admidio-icon-info" src="' . $icon . '" title="' . $label . '" alt="' . $label . '" />';
             }
@@ -2080,21 +2057,19 @@ class HtmlForm extends HtmlFormBasic
 
 
     /**
-     * This method send the whole html code of the form to the browser. Call this method
+     * This method create the whole html code of the form. Call this method
      * if you have finished your form layout. If mandatory fields were set than a notice
      * which marker represents the mandatory will be shown before the form.
-     * @param bool $directOutput (optional) If set to **true** (default) the form html will be directly send
-     *                                   to the browser. If set to **false** the html will be returned.
-     * @return string|null If $directOutput is set to **false** this method will return the html code of the form.
+     * @return string Return the html code of the form.
      */
-    public function show($directOutput = true)
+    public function show()
     {
         global $gL10n;
 
         // if there are no elements in the form then return nothing
         if ($this->countElements === 0)
         {
-            return null;
+            return '';
         }
 
         $html = '';
@@ -2107,12 +2082,6 @@ class HtmlForm extends HtmlFormBasic
 
         // now get whole form html code
         $html .= $this->getHtmlForm();
-
-        if ($directOutput)
-        {
-            echo $html;
-            return null;
-        }
 
         return $html;
     }

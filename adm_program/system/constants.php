@@ -20,12 +20,13 @@ define('SCRIPT_START_TIME', microtime(true));
 // ##################
 
 // !!! Please do not edit these version numbers !!!
-define('MIN_PHP_VERSION', '5.3.7');
+define('MIN_PHP_VERSION', '5.6.0');
 
 define('ADMIDIO_VERSION_MAIN', 3);
 define('ADMIDIO_VERSION_MINOR', 3);
 define('ADMIDIO_VERSION_PATCH', 3);
 define('ADMIDIO_VERSION_BETA', 0);
+
 define('ADMIDIO_VERSION', ADMIDIO_VERSION_MAIN . '.' . ADMIDIO_VERSION_MINOR . '.' . ADMIDIO_VERSION_PATCH);
 
 if(ADMIDIO_VERSION_BETA > 0)
@@ -66,7 +67,7 @@ else
 define('ADMIDIO_URL_PATH', parse_url($g_root_path, PHP_URL_PATH)); // /subfolder
 
 // PATHS
-define('WWW_PATH',     realpath($_SERVER['DOCUMENT_ROOT'])); // /var/www    Will get "SERVER_PATH" in v4.0
+define('SERVER_PATH',  realpath($_SERVER['DOCUMENT_ROOT'])); // /var/www
 define('ADMIDIO_PATH', dirname(dirname(__DIR__))); // /var/www/subfolder
 define('CURRENT_PATH', realpath($_SERVER['SCRIPT_FILENAME'])); // /var/www/subfolder/adm_program/index.php
 
@@ -78,8 +79,8 @@ define('CURRENT_URL', SCHEME . '://' . HOST . $_SERVER['REQUEST_URI']); // https
 // FOLDERS
 define('FOLDER_DATA', '/adm_my_files');
 define('FOLDER_CLASSES', '/adm_program/system/classes');
-define('FOLDER_LIBS_SERVER', '/adm_program/libs'); // PHP libs
-define('FOLDER_LIBS_CLIENT', '/adm_program/libs'); // JS/CSS libs
+define('FOLDER_LIBS_SERVER', '/adm_program/libs/server'); // PHP libs
+define('FOLDER_LIBS_CLIENT', '/adm_program/libs/client'); // JS/CSS libs
 define('FOLDER_LANGUAGES', '/adm_program/languages');
 define('FOLDER_THEMES', '/adm_themes');
 define('FOLDER_MODULES', '/adm_program/modules');
@@ -178,15 +179,3 @@ define('PASSWORD_GEN_CHARS', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
 // ####################
 // ###  DEPRECATED  ###
 // ####################
-
-// TODO deprecated: Remove in Admidio 4.0
-define('SERVER_PATH', ADMIDIO_PATH);
-
-$gCookiePraefix = COOKIE_PREFIX;
-
-// Define Constants for PHP 5.3
-if (!defined('JSON_UNESCAPED_SLASHES'))
-{
-    define('JSON_UNESCAPED_SLASHES', 64);
-    define('JSON_UNESCAPED_UNICODE', 256);
-}

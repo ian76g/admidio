@@ -116,8 +116,6 @@ class TableGuestbookComment extends TableAccess
 
             if ($columnName === 'gbc_email' && $newValue !== '')
             {
-                $newValue = admStrToLower($newValue);
-
                 // If Email has a invalid format, it won't be set
                 if (!strValidCharacters($newValue, 'email'))
                 {

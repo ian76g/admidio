@@ -103,7 +103,7 @@ function querySqlFile(Database $db, $sqlFileName)
  */
 function disableSoundexSearchIfPgSql(Database $db)
 {
-    if (DB_ENGINE === Database::PDO_ENGINE_PGSQL || DB_ENGINE === 'postgresql') // for backwards compatibility "postgresql"
+    if (DB_ENGINE === Database::PDO_ENGINE_PGSQL)
     {
         // soundex is not a default function in PostgreSQL
         $sql = 'UPDATE ' . TBL_PREFERENCES . '
@@ -111,44 +111,4 @@ function disableSoundexSearchIfPgSql(Database $db)
                  WHERE prf_name = \'system_search_similar\'';
         $db->queryPrepared($sql);
     }
-}
-
-/**
- * prueft, ob die Mindestvoraussetzungen bei PHP und MySQL eingehalten werden
- * @deprecated 3.3.0:4.0.0 Dropped without replacement.
- * @return string
- */
-function checkPhpVersion()
-{
-    global $gL10n, $gLogger;
-
-    $gLogger->warning('DEPRECATED: "checkPhpVersion()" is deprecated without replacement!');
-
-    // check PHP version
-    if (version_compare(PHP_VERSION, MIN_PHP_VERSION, '<'))
-    {
-        return $gL10n->get('SYS_PHP_VERSION') . ': <strong>' . PHP_VERSION . '</strong><br /><br />' .
-            $gL10n->get('INS_WRONG_PHP_VERSION', array(ADMIDIO_VERSION_TEXT, MIN_PHP_VERSION,
-                '<a href="' . ADMIDIO_HOMEPAGE . 'download.php">', '</a>'));
-    }
-
-    return '';
-}
-
-/**
- * @deprecated 3.3.0:4.0.0 Dropped without replacement.
- * @param string $message
- * @return string
- */
-function getErrorMessage($message)
-{
-    global $gLogger;
-
-    $gLogger->warning('DEPRECATED: "getErrorMessage()" is deprecated without replacement!');
-
-    return '
-        <div class="alert alert-danger alert-small" role="alert">
-            <span class="glyphicon glyphicon-exclamation-sign"></span>
-            <strong>' . $message . '</strong>
-        </div>';
 }

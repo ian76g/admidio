@@ -65,7 +65,7 @@ class Menu
 
         // if icon is imagefile or imageurl then show image
         if (preg_match('/^http(s?):\/\//', $icon) === 0 && admStrIsValidFileName($icon, true)
-        && (admStrEndsWith(admStrToLower($icon), '.png') || admStrEndsWith(admStrToLower($icon), '.jpg')))
+        && (StringUtils::strEndsWith($icon, '.png', false) || StringUtils::strEndsWith($icon, '.jpg', false)))
         {
             $icon = THEME_URL . '/icons/' . $icon;
         }
@@ -148,6 +148,11 @@ class Menu
      */
     public function show($complex = false)
     {
+        if (count($this->items) === 0)
+        {
+            return '';
+        }
+
         $html = '';
 
         if ($complex)
@@ -207,11 +212,6 @@ class Menu
 
         $html .= '</menu>'; // closes main-menu "menu.list-unstyled"
 
-        if (count($this->items) > 0)
-        {
-            return $html;
-        }
-
-        return '';
+        return $html;
     }
 }

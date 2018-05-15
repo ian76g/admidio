@@ -101,7 +101,7 @@ class Language
      * echo $gL10n->get('MAI_EMAIL_SEND_TO_ROLE_ACTIVE', array('John Doe', 'Demo-Organization', 'Administrator'));
      * ``
      */
-    public function get($textId, $params = array())
+    public function get($textId, array $params = array())
     {
         global $gLogger;
 
@@ -122,25 +122,7 @@ class Language
             return '#' . $textId . '#';
         }
 
-        // unify different formats into one
-        if (is_array($params))
-        {
-            $paramsArray = $params;
-        }
-        else
-        {
-            // TODO deprecated: Remove in Admidio 4.0
-            $paramsArray = func_get_args();
-            $txtId = '\'' . array_shift($paramsArray) . '\'';
-            $paramsString = '\'' . implode('\', \'', $paramsArray) . '\'';
-
-            $gLogger->warning(
-                'DEPRECATED: "$gL10n->get(' . $txtId . ', ' . $paramsString . ')" is deprecated, use "$gL10n->get(' . $txtId . ', array(' . $paramsString . '))" instead!',
-                array('textId' => $textId, 'params' => $params, 'allParams' => func_get_args())
-            );
-        }
-
-        return $this->prepareTextPlaceholders($text, $paramsArray);
+        return self::prepareTextPlaceholders($text, $params);
     }
 
     /**
@@ -252,31 +234,20 @@ class Language
     /**
      * Returns the language code of the language of this object. This is the code that is set within
      * Admidio with some specials like de_sie. If you only want the ISO code then call getLanguageIsoCode().
-     * @param bool $referenceLanguage If set to **true** than the language code of the reference language will returned.
      * @return string Returns the language code of the language of this object or the reference language.
      */
-    public function getLanguage($referenceLanguage = false)
+    public function getLanguage()
     {
-        global $gLogger;
-
-        if ($referenceLanguage)
-        {
-            $gLogger->warning('DEPRECATED: "$gL10n->getLanguage(true)" is deprecated, use "LanguageData::REFERENCE_LANGUAGE" instead!');
-
-            return LanguageData::REFERENCE_LANGUAGE;
-        }
-
         return $this->languageData->getLanguage();
     }
 
     /**
      * Returns the ISO code of the language of this object.
-     * @param bool $referenceLanguage If set to **true** than the ISO code of the reference language will returned.
      * @return string Returns the ISO code of the language of this object or the reference language e.g. **de** or **en**.
      */
-    public function getLanguageIsoCode($referenceLanguage = false)
+    public function getLanguageIsoCode()
     {
-        $language = $this->getLanguage($referenceLanguage);
+        $language = $this->getLanguage();
 
         if ($language === 'de_sie')
         {
@@ -395,7 +366,7 @@ class Language
                 '#VAR' . $paramNr . '#'      => $param,
                 '#VAR' . $paramNr . '_BOLD#' => '<strong>' . $param . '</strong>'
             );
-            $text = admStrMultiReplace($text, $replaces);
+            $text = StringUtils::strMultiReplace($text, $replaces);
         }
 
         // replace square brackets with html tags
@@ -416,7 +387,7 @@ class Language
             '\\\'' => '\'',
             '\''   => '&rsquo;'
         );
-        return admStrMultiReplace($text, $replaces);
+        return StringUtils::strMultiReplace($text, $replaces);
     }
 
     /**
@@ -450,13 +421,7 @@ class Language
 
         if ($xmlNodes === false || count($xmlNodes) === 0)
         {
-            // fallback for old Admidio language format prior to version 3.1
-            $xmlNodes = $xmlLanguageObjects[$languageFilePath]->xpath('/language/version/text[@id="'.$textId.'"]');
-
-            if ($xmlNodes === false || count($xmlNodes) === 0)
-            {
-                throw new \OutOfBoundsException('Could not found text-id!');
-            }
+            throw new \OutOfBoundsException('Could not found text-id!');
         }
 
         $text = self::prepareXmlText((string) $xmlNodes[0]);
@@ -540,89 +505,5 @@ class Language
         }
 
         return $string;
-    }
-
-    /**
-     * Adds a language data object to this class. The object contains all necessary
-     * language data that is stored in the PHP session.
-     * @deprecated 3.3.0:4.0.0 "$gL10n->addLanguageData($languageData)" is deprecated. Use "$gL10n = new Language($languageData)" instead.
-     * @param LanguageData $languageDataObject An object of the class **LanguageData**.
-     */
-    public function addLanguageData(LanguageData $languageDataObject)
-    {
-        global $gLogger;
-
-        $gLogger->warning('DEPRECATED: "$gL10n->addLanguageData($languageData)" is deprecated, use "$gL10n = new Language($languageData)" instead!');
-
-        $this->languageData =& $languageDataObject;
-    }
-
-    /**
-     * Adds a new path of language files to the array with all language paths where Admidio
-     * should search for language files.
-     * @deprecated 3.3.0:4.0.0 "$gL10n->addLanguagePath()" is deprecated, use "$gL10n->addLanguageFolderPath()" instead.
-     * @param string $languageFolderPath Server path where Admidio should search for language files.
-     * @return bool Returns true if language path is added.
-     */
-    public function addLanguagePath($languageFolderPath)
-    {
-        global $gLogger;
-
-        $gLogger->warning('DEPRECATED: "$gL10n->addLanguagePath()" is deprecated, use "$gL10n->addLanguageFolderPath()" instead!');
-
-        try
-        {
-            return $this->addLanguageFolderPath($languageFolderPath);
-        }
-        catch (\UnexpectedValueException $exception)
-        {
-            return false;
-        }
-    }
-
-    /**
-     * Returns the name of the country in the language of this object. The country will be
-     * identified by the ISO code (ISO 3166 ALPHA-3) e.g. 'DEU' or 'GBR' ...
-     * @param string $countryIsoCode The three digits ISO code (ISO 3166 ALPHA-3) of the country where the name should be returned.
-     * @deprecated 3.3.0:4.0.0 "$gL10n->getCountryByCode()" is deprecated, use "$gL10n->getCountryName()" instead.
-     * @return string|false Return the name of the country in the language of this object.
-     */
-    public function getCountryByCode($countryIsoCode)
-    {
-        global $gLogger;
-
-        $gLogger->warning('DEPRECATED: "$gL10n->getCountryByCode()" is deprecated, use "$gL10n->getCountryName()" instead!');
-
-        try
-        {
-            return $this->getCountryName($countryIsoCode);
-        }
-        catch (\RuntimeException $exception)
-        {
-            return false;
-        }
-    }
-
-    /**
-     * Returns the three digits ISO code (ISO 3166 ALPHA-3) of the country. The country will be identified
-     * by the name in the language of this object
-     * @param string $countryName The name of the country in the language of this object.
-     * @deprecated 3.3.0:4.0.0 "$gL10n->getCountryByName()" is deprecated, use "$gL10n->getCountryIsoCode()" instead.
-     * @return string|false Return the three digits ISO code (ISO 3166 ALPHA-3) of the country or false if country not found.
-     */
-    public function getCountryByName($countryName)
-    {
-        global $gLogger;
-
-        $gLogger->warning('DEPRECATED: "$gL10n->getCountryByName()" is deprecated, use "$gL10n->getCountryIsoCode()" instead!');
-
-        try
-        {
-            return $this->getCountryIsoCode($countryName);
-        }
-        catch (\RuntimeException $exception)
-        {
-            return false;
-        }
     }
 }

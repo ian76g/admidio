@@ -270,11 +270,11 @@ class TableAccess
                     {
                         if ($format === '' && isset($gSettingsManager))
                         {
-                            if (admStrContains($this->columnsInfos[$columnName]['type'], 'timestamp'))
+                            if (StringUtils::strContains($this->columnsInfos[$columnName]['type'], 'timestamp'))
                             {
                                 $format = $gSettingsManager->getString('system_date') . ' ' . $gSettingsManager->getString('system_time');
                             }
-                            elseif (admStrContains($this->columnsInfos[$columnName]['type'], 'date'))
+                            elseif (StringUtils::strContains($this->columnsInfos[$columnName]['type'], 'date'))
                             {
                                 $format = $gSettingsManager->getString('system_date');
                             }
@@ -348,7 +348,7 @@ class TableAccess
         }
 
         // if condition starts with AND then remove this
-        if (admStrStartsWith(strtoupper(ltrim($sqlWhereCondition)), 'AND'))
+        if (StringUtils::strStartsWith(ltrim($sqlWhereCondition), 'AND', false))
         {
             $sqlWhereCondition = substr($sqlWhereCondition, 4);
         }
@@ -510,7 +510,7 @@ class TableAccess
         {
             // Auto-Increment-Felder duerfen nicht im Insert/Update erscheinen
             // Felder anderer Tabellen auch nicht
-            if (admStrStartsWith($key, $this->columnPrefix . '_')
+            if (StringUtils::strStartsWith($key, $this->columnPrefix . '_')
             && !$this->columnsInfos[$key]['serial'] && $this->columnsInfos[$key]['changed'])
             {
                 if ($this->newRecord)
@@ -546,7 +546,7 @@ class TableAccess
             // insert record and mark this object as not new and remember the new id
             $sql = 'INSERT INTO '.$this->tableName.'
                            ('.implode(',', $sqlFieldArray).')
-                    VALUES ('.replaceValuesArrWithQM($sqlFieldArray).')';
+                    VALUES ('.Database::getQmForValues($sqlFieldArray).')';
             $this->db->queryPrepared($sql, $queryParams);
 
             $this->newRecord = false;

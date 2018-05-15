@@ -369,9 +369,9 @@ echo '<div id="plgCalendarContent" class="admidio-plugin-content">
 
 <table border="0" id="plgCalendarTable">
     <tr>';
-        if($plg_ajax_change)
-        {
-            echo '<th style="text-align: center;" class="plgCalendarHeader"><a href="#" onclick="$.get({
+if($plg_ajax_change)
+{
+    echo '<th style="text-align: center;" class="plgCalendarHeader"><a href="#" onclick="$.get({
                 url: \'' . ADMIDIO_URL . FOLDER_PLUGINS . '/' . $pluginFolder . '/calendar.php\',
                 cache: false,
                 data: \'ajax_change&amp;date_id='.date('mY', mktime(0, 0, 0, $currentMonth - 1, 1, $currentYear)).'\',
@@ -380,8 +380,8 @@ echo '<div id="plgCalendarContent" class="admidio-plugin-content">
                     $(\'.admidio-calendar-link\').popover();
                 }
             }); return false;">&laquo;</a></th>';
-            echo '<th colspan="5" style="text-align: center;" class="plgCalendarHeader">'.$months[$currentMonth - 1].' '.$currentYear.'</th>';
-            echo '<th style="text-align: center;" class="plgCalendarHeader"><a href="#" onclick="$.get({
+    echo '<th colspan="5" style="text-align: center;" class="plgCalendarHeader">'.$months[$currentMonth - 1].' '.$currentYear.'</th>';
+    echo '<th style="text-align: center;" class="plgCalendarHeader"><a href="#" onclick="$.get({
                 url: \'' . ADMIDIO_URL . FOLDER_PLUGINS . '/' . $pluginFolder . '/calendar.php\',
                 cache: false,
                 data: \'ajax_change&amp;date_id='.date('mY', mktime(0, 0, 0, $currentMonth + 1, 1, $currentYear)).'\',
@@ -390,12 +390,12 @@ echo '<div id="plgCalendarContent" class="admidio-plugin-content">
                     $(\'.admidio-calendar-link\').popover();
                 }
             }); return false;">&raquo;</a></th>';
-        }
-        else
-        {
-            echo '<th colspan="7" align="center" class="plgCalendarHeader">'.$months[$currentMonth - 1].' '.$currentYear.'</th>';
-        }
-    echo '</tr>
+}
+else
+{
+    echo '<th colspan="7" align="center" class="plgCalendarHeader">'.$months[$currentMonth - 1].' '.$currentYear.'</th>';
+}
+echo '</tr>
     <tr>
         <td class="plgCalendarWeekday"><strong>'.$gL10n->get('PLG_CALENDAR_MONDAY_SHORT').'</strong></td>
         <td class="plgCalendarWeekday"><strong>'.$gL10n->get('PLG_CALENDAR_TUESDAY_SHORT').'</strong></td>

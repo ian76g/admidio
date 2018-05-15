@@ -66,7 +66,7 @@ class TableFolder extends TableAccess
         {
             while (($entry = readdir($dirHandle)) !== false)
             {
-                if ($entry === '.' || $entry === '..' || admStrStartsWith($entry, '.'))
+                if ($entry === '.' || $entry === '..' || StringUtils::strStartsWith($entry, '.'))
                 {
                     continue;
                 }
@@ -818,19 +818,5 @@ class TableFolder extends TableAccess
         }
 
         return parent::save($updateFingerPrint);
-    }
-
-    /**
-     * Gets the absolute path of the folder (with folder-name)
-     * @deprecated 3.3.0:4.0.0 Use Method getFullFolderPath() instead.
-     * @return string
-     */
-    public function getCompletePathOfFolder()
-    {
-        global $gLogger;
-
-        $gLogger->warning('DEPRECATED: "$folder->getCompletePathOfFolder()" is deprecated, use "$folder->getFolderPath()" instead!');
-
-        return $this->getFolderPath();
     }
 }

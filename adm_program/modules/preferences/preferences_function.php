@@ -113,7 +113,6 @@ switch($getMode)
 
                     if($_POST['mail_sendmail_address'] !== '')
                     {
-                        $_POST['mail_sendmail_address'] = admStrToLower($_POST['mail_sendmail_address']);
                         if(!strValidCharacters($_POST['mail_sendmail_address'], 'email'))
                         {
                             $gMessage->show($gL10n->get('SYS_EMAIL_INVALID', array($gL10n->get('MAI_SENDER_EMAIL'))));
@@ -132,7 +131,6 @@ switch($getMode)
                     }
                     else
                     {
-                        $_POST['email_administrator'] = admStrToLower($_POST['email_administrator']);
                         if(!strValidCharacters($_POST['email_administrator'], 'email'))
                         {
                             $gMessage->show($gL10n->get('SYS_EMAIL_INVALID', array($gL10n->get('ORG_SYSTEM_MAIL_ADDRESS'))));
@@ -221,11 +219,11 @@ switch($getMode)
             // Elmente, die nicht in adm_preferences gespeichert werden hier aussortieren
             if($key !== 'save')
             {
-                if(admStrStartsWith($key, 'org_'))
+                if(StringUtils::strStartsWith($key, 'org_'))
                 {
                     $gCurrentOrganization->setValue($key, $value);
                 }
-                elseif(admStrStartsWith($key, 'SYSMAIL_'))
+                elseif(StringUtils::strStartsWith($key, 'SYSMAIL_'))
                 {
                     $text = new TableText($gDb);
                     $text->readDataByColumns(array('txt_org_id' => $gCurrentOrganization->getValue('org_id'), 'txt_name' => $key));
@@ -308,7 +306,7 @@ switch($getMode)
         );
 
         // add form to html page and show page
-        $page->addHtml($form->show(false));
+        $page->addHtml($form->show());
         $page->show();
         break;
 
@@ -382,7 +380,7 @@ switch($getMode)
         $form->addSubmitButton('btn_forward', $gL10n->get('SYS_NEXT'), array('icon' => THEME_URL.'/icons/forward.png'));
 
         // add form to html page and show page
-        $page->addHtml($form->show(false));
+        $page->addHtml($form->show());
         $page->show();
 
         // clean up

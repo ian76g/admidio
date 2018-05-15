@@ -35,14 +35,9 @@ if (!$gSettingsManager->getBool('lists_enable_module'))
 }
 
 // only users with the right to assign roles can view inactive roles
-// within PHP 5.3 false will not be set and therefore we must add 0 as value
-if($getActiveRole || !$gCurrentUser->checkRolesRight('rol_assign_roles'))
+if(!$gCurrentUser->checkRolesRight('rol_assign_roles'))
 {
-    $getActiveRole = 1;
-}
-else
-{
-    $getActiveRole = 0;
+    $getActiveRole = true;
 }
 
 // set headline of the script
@@ -458,7 +453,7 @@ $javascriptCode .= '
 
     function loadList() {
         var listId = $("#sel_select_configuration").val();
-        self.location.href = "' . safeUrl(ADMIDIO_URL . FOLDER_MODULES . '/lists/mylist.php', array('active_role' => $getActiveRole)) . '&lst_id=" + listId;
+        self.location.href = "' . safeUrl(ADMIDIO_URL . FOLDER_MODULES . '/lists/mylist.php', array('active_role' => (int) $getActiveRole)) . '&lst_id=" + listId;
     }
 
     /**
@@ -689,7 +684,7 @@ if($getActiveRole)
                            FROM '.TBL_ROLES.'
                      INNER JOIN '.TBL_CATEGORIES.'
                              ON cat_id = rol_cat_id
-                          WHERE rol_id IN (' . replaceValuesArrWithQM($allVisibleRoles) . ')
+                          WHERE rol_id IN (' . Database::getQmForValues($allVisibleRoles) . ')
                        ORDER BY cat_sequence, rol_name';
     $sqlData['params'] = $allVisibleRoles;
 }
@@ -737,5 +732,5 @@ $form->addButton(
 );
 
 // add form to html page and show page
-$page->addHtml($form->show(false));
+$page->addHtml($form->show());
 $page->show();

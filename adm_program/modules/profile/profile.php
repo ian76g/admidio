@@ -452,13 +452,13 @@ $page->addHtml('
                             $field = getFieldCode($fieldNameIntern, $user);
                             if(is_array($field) && $field['value'] !== '')
                             {
-                                $form->addStaticControl(admStrToLower($fieldNameIntern), $field['label'], $field['value']);
+                                $form->addStaticControl(strtolower($fieldNameIntern), $field['label'], $field['value']);
                             }
                             break;
                     }
                 }
             }
-            $page->addHtml($form->show(false));
+            $page->addHtml($form->show());
         $page->addHtml('</div>
         <div class="col-sm-4" id="div_profile_photo">');
 
@@ -509,7 +509,7 @@ foreach($gProfileFields->getProfileFields() as $field)
             if($category !== '')
             {
                 // new category then show last form and close div container
-                $page->addHtml($form->show(false));
+                $page->addHtml($form->show());
                 $page->addHtml('</div></div>');
             }
             $category = $field->getValue('cat_name');
@@ -529,7 +529,7 @@ foreach($gProfileFields->getProfileFields() as $field)
             $field = getFieldCode($fieldNameIntern, $user);
             if(is_array($field) && $field['value'] !== '')
             {
-                $form->addStaticControl(admStrToLower($fieldNameIntern), $field['label'], $field['value']);
+                $form->addStaticControl(strtolower($fieldNameIntern), $field['label'], $field['value']);
             }
         }
     }
@@ -538,7 +538,7 @@ foreach($gProfileFields->getProfileFields() as $field)
 if($category !== '')
 {
     // new category then show last form and close div container
-    $page->addHtml($form->show(false));
+    $page->addHtml($form->show());
     $page->addHtml('</div></div>');
 }
 

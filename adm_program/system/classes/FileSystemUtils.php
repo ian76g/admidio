@@ -25,7 +25,7 @@ final class FileSystemUtils
     const ROOT_ID = 0;
     const ROOT_FOLDER = '/';
 
-    const DEFAULT_MODE_DIRECTORY = 0777; // TODO: Security Issue! Change in v4.0 to 0775
+    const DEFAULT_MODE_DIRECTORY = 0775;
     const DEFAULT_MODE_FILE      = 0664;
 
     /**
@@ -51,10 +51,10 @@ final class FileSystemUtils
      */
     public static function getGeneratedFilename($filename)
     {
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
         $now = new \DateTime();
 
-        return $now->format('Ymd-His') . '_' . PasswordHashing::genRandomPassword(16, $charset = '0123456789abcdefghijklmnopqrstuvwxyz') . '.' . strtolower($extension);
+        return $now->format('Ymd-His') . '_' . PasswordUtils::genRandomPassword(16, $charset = '0123456789abcdefghijklmnopqrstuvwxyz') . '.' . $extension;
     }
 
     /**

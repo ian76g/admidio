@@ -176,7 +176,7 @@ class ModuleDates extends Modules
                    AND mem.mem_usr_id = ? -- $gCurrentUser->getValue(\'usr_id\')
                    AND mem.mem_begin <= ? -- DATE_NOW
                    AND mem.mem_end    > ? -- DATE_NOW
-                 WHERE cat_id IN ('.replaceValuesArrWithQM($catIdParams).')
+                 WHERE cat_id IN ('.Database::getQmForValues($catIdParams).')
                        ' . $sqlConditions['sql'] . '
               ORDER BY dat_begin ' . $this->order;
 
@@ -264,7 +264,7 @@ class ModuleDates extends Modules
                   FROM ' . TBL_DATES . '
             INNER JOIN ' . TBL_CATEGORIES . '
                     ON cat_id = dat_cat_id
-                 WHERE cat_id IN ('.replaceValuesArrWithQM($catIdParams).')
+                 WHERE cat_id IN ('.Database::getQmForValues($catIdParams).')
                        '. $sqlConditions['sql'];
 
         $statement = $gDb->queryPrepared($sql, array_merge($catIdParams, $sqlConditions['params']));
@@ -466,7 +466,7 @@ class ModuleDates extends Modules
                                         ON rrd_ror_id = ror_id
                                      WHERE ror_name_intern = \'event_participation\'
                                        AND rrd_object_id = dat_id
-                                       AND rrd_rol_id IN ('.replaceValuesArrWithQM($roleMemberships).')) ';
+                                       AND rrd_rol_id IN ('.Database::getQmForValues($roleMemberships).')) ';
                     $params = array_merge($params, $roleMemberships);
                     break;
 
@@ -487,81 +487,5 @@ class ModuleDates extends Modules
             'sql'    => $sqlConditions,
             'params' => $params
         );
-    }
-
-    /**
-     * Method validates all date inputs and formats them to date format 'Y-m-d' needed for database queries
-     * @deprecated 3.2.0:4.0.0 Dropped without replacement.
-     * @param string $date Date to be validated and formated if needed
-     * @return string|false
-     */
-    private function formatDate($date)
-    {
-        global $gLogger, $gSettingsManager;
-
-        $gLogger->warning('DEPRECATED: "$moduleDates->formatDate()" is deprecated without replacement!');
-
-        $objDate = \DateTime::createFromFormat('Y-m-d', $date);
-        if ($objDate !== false)
-        {
-            return $date;
-        }
-
-        // check if date has system format
-        $objDate = \DateTime::createFromFormat($gSettingsManager->getString('system_date'), $date);
-        if ($objDate !== false)
-        {
-            return $objDate->format('Y-m-d');
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns value for form field.
-     * This method compares a date value to a reference value and to date '1970-01-01'.
-     * Html output will be set regarding the parameters.
-     * If value matches the reference or date('1970-01-01'), the output value is cleared to get an empty string.
-     * This method can be used to fill a html form
-     * @deprecated 3.2.0:4.0.0 Dropped without replacement.
-     * @param string $date      Date is to be checked to reference and default date '1970-01-01'.
-     * @param string $reference Reference date
-     * @return string|false String with date value, or an empty string, if $date is '1970-01-01' or reference date
-     */
-    public function getFormValue($date, $reference)
-    {
-        global $gLogger;
-
-        $gLogger->warning('DEPRECATED: "$moduleDates->getFormValue()" is deprecated without replacement!');
-
-        if (isset($date, $reference))
-        {
-            return $this->setFormValue($date, $reference);
-        }
-
-        return false;
-    }
-
-    /**
-     * Check date value to reference and set html output.
-     * If value matches to reference, value is cleared to get an empty string.
-     * @deprecated 3.2.0:4.0.0 Dropped without replacement.
-     * @param string $date
-     * @param string $reference
-     * @return string
-     */
-    private function setFormValue($date, $reference)
-    {
-        global $gLogger;
-
-        $gLogger->warning('DEPRECATED: "$moduleDates->setFormValue()" is deprecated without replacement!');
-
-        $checkedDate = $this->formatDate($date);
-        if ($checkedDate === $reference || $checkedDate === '1970-01-01')
-        {
-            $date = '';
-        }
-
-        return $date;
     }
 }

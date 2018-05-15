@@ -32,7 +32,7 @@ $plg_link_target_geb = '_self';
 $plg_ter_aktiv = 1;
 
 // Anzeige der Termine nur für Mitglieder (eingeloggt) (1) oder alle (0)
-$plg_ter_login = 0;
+$plg_ter_login = 1;
 
 // Anzeige der Geburtstage aktiviert (1) oder deaktiviert (0)
 $plg_geb_aktiv = 1;

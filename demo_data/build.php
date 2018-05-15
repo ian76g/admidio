@@ -23,8 +23,7 @@ if (is_file($configPath))
 }
 elseif (is_file($rootPath . '/config.php'))
 {
-    // search in path of version 1.x and 2.x
-    require_once($rootPath . '/config.php');
+    exit('<div style="color: #cc0000;">Old v1.x or v2.x Config-File detected! Please update first to the latest v3.3 Version!</div>');
 }
 else
 {
@@ -150,7 +149,7 @@ function executeSqlStatements(array $sqlStatements, $filename)
             foreach ($results[0] as $value)
             {
                 // if it's a string of a systemmail then html linefeeds must be replaced
-                if (admStrStartsWith($value, 'SYS_SYSMAIL_'))
+                if (StringUtils::strStartsWith($value, 'SYS_SYSMAIL_'))
                 {
                     // convert <br /> to a normal line feed
                     $convertedText = preg_replace('/<br[[:space:]]*\/?[[:space:]]*>/', chr(13).chr(10), $gL10n->get($value));
@@ -201,7 +200,7 @@ function resetPostgresSequences()
 {
     global $gDb;
 
-    if (DB_ENGINE === Database::PDO_ENGINE_PGSQL || DB_ENGINE === 'postgresql') // for backwards compatibility "postgresql"
+    if (DB_ENGINE === Database::PDO_ENGINE_PGSQL)
     {
         $sql = 'SELECT relname
                   FROM pg_class
