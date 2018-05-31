@@ -10,7 +10,7 @@
  */
 
 // Anzahl der Termine, die angezeigt werden sollen (Default = 2)
-$plg_dates_count = 2;
+$plg_dates_count = 4;
 
 // Bis-Uhrzeit/Datum anzeigen
 // 0 = Bis-Uhrzeit und Datum nicht anzeigen
