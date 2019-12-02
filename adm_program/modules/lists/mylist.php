@@ -245,7 +245,8 @@ $arrParticipientsInformation = array(
     'mem_usr_id_change'    => $gL10n->get('LST_USER_CHANGED'),
     'mem_timestamp_change' => $gL10n->get('SYS_CHANGED_AT'),
     'mem_comment'          => $gL10n->get('SYS_COMMENT'),
-    'mem_count_guests'     => $gL10n->get('LST_SEAT_AMOUNT')
+    'mem_count_guests'     => $gL10n->get('LST_SEAT_AMOUNT'),
+    'mem_age_triplets'     => $gL10n->get('DAT_AGE_TRIPLETS')
 );
 
 foreach($gProfileFields->getProfileFields() as $field)

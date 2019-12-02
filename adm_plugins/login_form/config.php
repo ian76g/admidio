@@ -12,13 +12,13 @@
 // Zeigt einen Link zum Registrieren unter dem Loginbutton an
 // 1 = (Default) Link wird angezeigt
 // 0 = Link wird nicht angezeigt
-$plg_show_register_link = 1;
+$plg_show_register_link = 0;
 
 // Zeigt einen Link um eine E-Mail an den Webmaster zu schreiben,
 // falls es Probleme beim Login gibt
 // 1 = (Default) Link wird angezeigt
 // 0 = Link wird nicht angezeigt
-$plg_show_email_link = 1;
+$plg_show_email_link = 0;
 
 // Zeigt nach dem Einloggen einen Link zum Ausloggen an
 // 1 = (Default) Link wird angezeigt

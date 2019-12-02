@@ -932,11 +932,14 @@ if($gSettingsManager->getBool('members_enable_user_relations'))
                   FROM '.TBL_USER_RELATIONS.'
             INNER JOIN '.TBL_USER_RELATION_TYPES.'
                     ON ure_urt_id  = urt_id
+
+LEFT JOIN tbl_user_data UD on UD.usd_usr_id = ure_usr_id2 and usd_usf_id=26
+
                  WHERE ure_usr_id1 = ? -- $userId
                    AND urt_name        <> \'\'
                    AND urt_name_male   <> \'\'
                    AND urt_name_female <> \'\'
-              ORDER BY urt_name';
+              ORDER BY urt_name, UD.usd_value';
         $relationStatement = $gDb->queryPrepared($sql, array($userId));
 
         $relationtype = new TableUserRelationType($gDb);

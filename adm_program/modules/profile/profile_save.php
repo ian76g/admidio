@@ -205,7 +205,7 @@ foreach($gProfileFields->getProfileFields() as $field)
                         // => EXIT
                         break;
                     case 'EMAIL':
-                        $gMessage->show($gL10n->get('SYS_EMAIL_INVALID', array($field->getValue('usf_name'))));
+                        $gMessage->show('XX'.$gL10n->get('SYS_EMAIL_INVALID', array($field->getValue('usf_name'))));
                         // => EXIT
                         break;
                     case 'NUMBER':

@@ -58,6 +58,38 @@ $htmlSubHeadline = '';
 $showLinkMailToList = true;
 $hasRightViewFormerMembers = true;
 
+
+$sql = "CREATE TEMPORARY TABLE tmp AS
+select
+  M.mem_id,
+       YEAR(dat_begin)-YEAR(DATA.usd_value)-IF(STR_TO_DATE(CONCAT(YEAR(dat_begin), '-', MONTH(DATA.usd_value), '-', DAY(DATA.usd_value)) ,'%Y-%m-%d') > dat_begin, 1, 0) AS age
+from tbl_members M join tbl_roles R on M.mem_rol_id = R.rol_id and R.rol_cat_id = 3
+join tbl_dates D on D.dat_rol_id = R.rol_id
+left join tbl_user_relations REL on REL.ure_usr_id1 = M.mem_usr_id and REL.ure_urt_id = 2
+left join tbl_user_data DATA on DATA.usd_usr_id = REL.ure_usr_id2 and DATA.usd_usf_id = 10
+group by D.dat_id, M.mem_usr_id;";
+$gDb->query($sql);
+$sql = "UPDATE tbl_members M join tmp T on M.mem_id = T.mem_id set M.mem_age_triplets = T.age;";
+$gDb->query($sql);
+$sql = "DROP TEMPORARY TABLE tmp;";
+$gDb->query($sql);
+
+$sql = "CREATE TEMPORARY TABLE tmp AS
+select
+  M.mem_id,
+       YEAR(CURDATE())-YEAR(DATA.usd_value)-IF(STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-', MONTH(DATA.usd_value), '-', DAY(DATA.usd_value)) ,'%Y-%m-%d') > CURDATE(), 1, 0) AS age
+from tbl_members M join tbl_roles R on M.mem_rol_id = R.rol_id and R.rol_cat_id in (6,18)
+left join tbl_user_relations REL on REL.ure_usr_id1 = M.mem_usr_id and REL.ure_urt_id = 2
+left join tbl_user_data DATA on DATA.usd_usr_id = REL.ure_usr_id2 and DATA.usd_usf_id = 10
+group by M.mem_usr_id;";
+$gDb->query($sql);
+$sql = "UPDATE tbl_members M join tmp T on M.mem_id = T.mem_id set M.mem_age_triplets = T.age;";
+$gDb->query($sql);
+$sql = "DROP TEMPORARY TABLE tmp;";
+$gDb->query($sql);
+
+
+
 if ($numberRoles > 1)
 {
     $sql = 'SELECT rol_id, rol_name, rol_valid
@@ -248,6 +280,7 @@ $arrColName = array(
     'mem_usr_id_change'    => $gL10n->get('LST_USER_CHANGED'),
     'mem_timestamp_change' => $gL10n->get('SYS_CHANGED_AT'),
     'mem_comment'          => $gL10n->get('SYS_COMMENT'),
+    'mem_age_triplets'     => $gL10n->get('DAT_AGE_TRIPLETS'),
     'mem_count_guests'     => $gL10n->get('LST_SEAT_AMOUNT')
 );
 

@@ -58,6 +58,7 @@
     <string name="DAT_DATES">Termine</string>
     <string name="DAT_DATES_DESC">Termine können hier angelegt und angeschaut werden. Benutzer können sich auf Wunsch zu diesen Terminen anmelden.</string>
     <string name="DAT_DEADLINE">Anmeldeschluss</string>
+    <string name="DAT_ASSOCIATED_PHOTO_ALBUM">zugeordnetes Photoalbum</string>
     <string name="DAT_DEADLINE_ATTENTION">Deine Anmeldung kann nicht mehr verändert werden, da das vorgegebene Enddatum für Anmeldungen erreicht wurde oder der Termin in der Vergangenheit liegt. Bitte wende dich an die Leiter des Termins oder einen Administrator!</string>
     <string name="DAT_DEADLINE_DESC">Teilnehmer können sich bis zu diesem Datum am Termin anmelden. Leiter und Benutzer mit dem Recht Termine zu bearbeiten können weiterhin Teilnehmer zuordnen. Wenn kein Datumswert angegeben wird, dann wird als Default das Startdatum des Termins als Anmeldeschluss angenommen.</string>
     <string name="DAT_DEFAULT_LIST_CONFIGURATION">Standardkonfiguration  der Teilnehmerliste</string>
@@ -125,6 +126,8 @@
     <string name="DAT_VIEW_MODE_DETAIL">Detailliert</string>
     <string name="DAT_VIEW_MODE_COMPACT">Kompakt</string>
     <string name="DAT_VISIBILITY">Sichtbarkeit</string>
+    <string name="DAT_PHOTO_RIGHTS">Das hier ausgewählte Fotoalbum kann nur von Teilnehmern dieses Events eingesehen werden.</string>
+    <string name="DAT_AGE_TRIPLETS">Alter der Mehrlinge</string>
     <!-- Phrases only in Downloadsmodule -->
     <string name="DOW_ADD_TO_DATABASE">Zur Datenbank hinzufügen</string>
     <string name="DOW_ADDITIONAL_FILES">In dieser Übersicht sind Dateien und Ordner aufgelistet, die noch nicht in der Datenbank verwaltet werden. Diese können nun der Datenbank hinzugefügt werden. Es werden automatisch die Berechtigungen des aktuellen Ordners übernommen.</string>

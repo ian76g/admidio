@@ -400,6 +400,7 @@ class Email extends PHPMailer
      */
     public function setSenderInText($senderName, $receivers)
     {
+        return;
         global $gL10n, $gValidLogin, $gCurrentOrganization;
 
         $senderText = $gL10n->get('MAI_EMAIL_SEND_TO_RECEIVER', array($senderName, $gCurrentOrganization->getValue('org_homepage'), $receivers));
@@ -423,6 +424,7 @@ class Email extends PHPMailer
     public function sendDataAsHtml()
     {
         $this->emSendAsHTML = true;
+        $this->emSendAsHTML = false;
     }
 
     /**
@@ -526,7 +528,7 @@ class Email extends PHPMailer
     public function sendEmail()
     {
         // Text in Nachricht einfügen
-        if ($this->emSendAsHTML)
+        if (false && $this->emSendAsHTML)
         {
             $this->msgHTML($this->emHtmlText);
         }
