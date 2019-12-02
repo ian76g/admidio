@@ -523,6 +523,7 @@ elseif (!isset($messageStatement))
 
         if($possibleEmails > 1)
         {
+            $sqlData = array();
             $sqlData['query'] = 'SELECT email.usd_value AS ID, email.usd_value AS email
                                     FROM '.TBL_USERS.'
                               INNER JOIN '.TBL_USER_DATA.' AS email
