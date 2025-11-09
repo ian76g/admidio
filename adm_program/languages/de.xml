@@ -58,6 +58,7 @@
     <string name="DAT_DATES">Termine</string>
     <string name="DAT_DATES_DESC">Termine können hier angelegt und angeschaut werden. Benutzer können sich auf Wunsch zu diesen Terminen anmelden.</string>
     <string name="DAT_DEADLINE">Anmeldeschluss</string>
+    <string name="DAT_ASSOCIATED_PHOTO_ALBUM">zugeordnetes Photoalbum</string>
     <string name="DAT_DEADLINE_ATTENTION">Deine Anmeldung kann nicht mehr verändert werden, da das vorgegebene Enddatum für Anmeldungen erreicht wurde oder der Termin in der Vergangenheit liegt. Bitte wende dich an die Leiter des Termins oder einen Administrator!</string>
     <string name="DAT_DEADLINE_DESC">Teilnehmer können sich bis zu diesem Datum am Termin anmelden. Leiter und Benutzer mit dem Recht Termine zu bearbeiten können weiterhin Teilnehmer zuordnen. Wenn kein Datumswert angegeben wird, dann wird als Default das Startdatum des Termins als Anmeldeschluss angenommen.</string>
     <string name="DAT_DEFAULT_LIST_CONFIGURATION">Standardkonfiguration  der Teilnehmerliste</string>
@@ -125,6 +126,9 @@
     <string name="DAT_VIEW_MODE_DETAIL">Detailliert</string>
     <string name="DAT_VIEW_MODE_COMPACT">Kompakt</string>
     <string name="DAT_VISIBILITY">Sichtbarkeit</string>
+    <string name="DAT_PHOTO_RIGHTS">Das hier ausgewählte Fotoalbum kann nur von Teilnehmern dieses Events eingesehen werden.</string>
+    <string name="DAT_AGE_TRIPLETS">Alter der Mehrlinge</string>
+    <string name="DAT_GRADE">Grad der Schwangerschaft</string>
     <!-- Phrases only in Downloadsmodule -->
     <string name="DOW_ADD_TO_DATABASE">Zur Datenbank hinzufügen</string>
     <string name="DOW_ADDITIONAL_FILES">In dieser Übersicht sind Dateien und Ordner aufgelistet, die noch nicht in der Datenbank verwaltet werden. Diese können nun der Datenbank hinzugefügt werden. Es werden automatisch die Berechtigungen des aktuellen Ordners übernommen.</string>
@@ -949,7 +953,7 @@
     <string name="PRO_UPLOAD_HELP_1">Auf den Button #VAR1_BOLD# klicken und die gewünschte Fotodatei von der Festplatte auswählen.</string>
     <string name="PRO_UPLOAD_HELP_2">Danach auf #VAR1_BOLD# klicken und ein wenig Geduld haben.</string>
     <string name="PRO_UPLOAD_PHOTO">Foto hochladen</string>
-    <string name="PRO_USERNAME_DESCRIPTION">Mit diesem Namen kannst du dich später auf der Homepage anmelden.\n\nDer Name muss im System eindeutig sein. Ist dein Wunschname bereits vergeben, dann versuche es mit Kombinationen, wie zum Beispiel Andi78 oder StefanT.</string>
+    <string name="PRO_USERNAME_DESCRIPTION">Mit diesem Namen kannst du dich später auf der Homepage anmelden.\n\nDer Name muss im System eindeutig sein. Bitte benutze die Form: familie.NACHNAME\n\nSollte der Name schon vergeben sein, dann hänge eine Ziffer an z.B. familie.NACHNAME-2</string>
     <string name="PRO_VIEW_ROLES_OTHER_ORGAS">Es werden dir hier nur Rollen anderer Organisationen angezeigt, die dort für alle angemeldete Benutzer sichtbar sind. Falls du auch Mitglied dieser Organisation bist, werden dir zusätzlich die Rollen angezeigt, die du mit deinen Rechten innerhalb der jeweiligen Organisation sehen darfst.</string>
     <string name="PRO_WANT_DELETE_PHOTO">Soll das ausgewählte Foto wirklich gelöscht werden?</string>
     <string name="PRO_YEARS">Jahre</string>

@@ -133,6 +133,8 @@ class TableGuestbook extends TableAccess
             }
             elseif ($columnName === 'gbo_email' && $newValue !== '')
             {
+                $newValue = admStrToLower($newValue);
+
                 // If Email has a invalid format, it won't be set
                 if (!strValidCharacters($newValue, 'email'))
                 {

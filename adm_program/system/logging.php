@@ -90,7 +90,7 @@ function initLogging(\Psr\Log\LoggerInterface $logger)
             'CURRENT_URL' => CURRENT_URL
         ),
         'PATHS' => array(
-            'SERVER_PATH'  => SERVER_PATH,
+            'WWW_PATH'     => WWW_PATH, // Will get "SERVER_PATH" in v4.0
             'ADMIDIO_PATH' => ADMIDIO_PATH,
             'CURRENT_PATH' => CURRENT_PATH
         )

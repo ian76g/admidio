@@ -35,9 +35,14 @@ if (!$gSettingsManager->getBool('lists_enable_module'))
 }
 
 // only users with the right to assign roles can view inactive roles
-if(!$gCurrentUser->checkRolesRight('rol_assign_roles'))
+// within PHP 5.3 false will not be set and therefore we must add 0 as value
+if($getActiveRole || !$gCurrentUser->checkRolesRight('rol_assign_roles'))
 {
-    $getActiveRole = true;
+    $getActiveRole = 1;
+}
+else
+{
+    $getActiveRole = 0;
 }
 
 // set headline of the script
@@ -240,7 +245,9 @@ $arrParticipientsInformation = array(
     'mem_usr_id_change'    => $gL10n->get('LST_USER_CHANGED'),
     'mem_timestamp_change' => $gL10n->get('SYS_CHANGED_AT'),
     'mem_comment'          => $gL10n->get('SYS_COMMENT'),
-    'mem_count_guests'     => $gL10n->get('LST_SEAT_AMOUNT')
+    'mem_count_guests'     => $gL10n->get('LST_SEAT_AMOUNT'),
+    'mem_age_triplets'     => $gL10n->get('DAT_AGE_TRIPLETS'),
+    'mem_grade'            => $gL10n->get('DAT_GRADE')
 );
 
 foreach($gProfileFields->getProfileFields() as $field)
@@ -453,7 +460,7 @@ $javascriptCode .= '
 
     function loadList() {
         var listId = $("#sel_select_configuration").val();
-        self.location.href = "' . safeUrl(ADMIDIO_URL . FOLDER_MODULES . '/lists/mylist.php', array('active_role' => (int) $getActiveRole)) . '&lst_id=" + listId;
+        self.location.href = "' . safeUrl(ADMIDIO_URL . FOLDER_MODULES . '/lists/mylist.php', array('active_role' => $getActiveRole)) . '&lst_id=" + listId;
     }
 
     /**
@@ -684,7 +691,7 @@ if($getActiveRole)
                            FROM '.TBL_ROLES.'
                      INNER JOIN '.TBL_CATEGORIES.'
                              ON cat_id = rol_cat_id
-                          WHERE rol_id IN (' . Database::getQmForValues($allVisibleRoles) . ')
+                          WHERE rol_id IN (' . replaceValuesArrWithQM($allVisibleRoles) . ')
                        ORDER BY cat_sequence, rol_name';
     $sqlData['params'] = $allVisibleRoles;
 }
@@ -732,5 +739,5 @@ $form->addButton(
 );
 
 // add form to html page and show page
-$page->addHtml($form->show());
+$page->addHtml($form->show(false));
 $page->show();

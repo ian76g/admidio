@@ -124,8 +124,8 @@ class ComponentUpdate extends Component
     {
         // get the method name (remove "ComponentUpdateSteps::")
         $methodName = substr($updateStepContent, 22);
-        // now call the method
-        ComponentUpdateSteps::{$methodName}();
+        // now call the method that is also compatible to PHP 5.3
+        ComponentUpdateSteps::$methodName();
     }
 
     /**
@@ -152,13 +152,20 @@ class ComponentUpdate extends Component
     {
         global $gLogger;
 
+        // for backwards compatibility "postgresql"
+        $dbType = DB_ENGINE;
+        if (DB_ENGINE === 'postgresql')
+        {
+            $dbType = Database::PDO_ENGINE_PGSQL;
+        }
+
         $updateStepContent = trim((string) $xmlNode);
 
         $startTime = microtime(true);
 
         // if a method of this class was set in the update step
         // then call this function and don't execute a SQL statement
-        if (StringUtils::strStartsWith($updateStepContent, 'ComponentUpdateSteps::'))
+        if (admStrStartsWith($updateStepContent, 'ComponentUpdateSteps::'))
         {
             $gLogger->info('UPDATE: Execute update step Nr: ' . (int) $xmlNode['id']);
 
@@ -167,7 +174,7 @@ class ComponentUpdate extends Component
             $gLogger->debug('UPDATE: Execution time ' . getExecutionTime($startTime));
         }
         // only execute if sql statement is for all databases or for the used database
-        elseif (!isset($xmlNode['database']) || (string) $xmlNode['database'] === DB_ENGINE)
+        elseif (!isset($xmlNode['database']) || (string) $xmlNode['database'] === $dbType)
         {
             $showError = true;
             // if the attribute error was set to "ignore" then don't show errors that occurs on sql execution
@@ -182,7 +189,7 @@ class ComponentUpdate extends Component
 
             $gLogger->debug('UPDATE: Execution time ' . getExecutionTime($startTime));
         }
-        elseif ((string) $xmlNode['database'] !== DB_ENGINE)
+        elseif ((string) $xmlNode['database'] !== $dbType)
         {
             $gLogger->info(
                 'UPDATE: Update step is for another database!',

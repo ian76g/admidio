@@ -60,6 +60,9 @@ else
     }
 }
 
+//var_dump($page->showMainMenu());
+//die();
+
 // display Menu
 $page->addHtml($page->showMainMenu());
 

@@ -452,13 +452,13 @@ $page->addHtml('
                             $field = getFieldCode($fieldNameIntern, $user);
                             if(is_array($field) && $field['value'] !== '')
                             {
-                                $form->addStaticControl(strtolower($fieldNameIntern), $field['label'], $field['value']);
+                                $form->addStaticControl(admStrToLower($fieldNameIntern), $field['label'], $field['value']);
                             }
                             break;
                     }
                 }
             }
-            $page->addHtml($form->show());
+            $page->addHtml($form->show(false));
         $page->addHtml('</div>
         <div class="col-sm-4" id="div_profile_photo">');
 
@@ -509,7 +509,7 @@ foreach($gProfileFields->getProfileFields() as $field)
             if($category !== '')
             {
                 // new category then show last form and close div container
-                $page->addHtml($form->show());
+                $page->addHtml($form->show(false));
                 $page->addHtml('</div></div>');
             }
             $category = $field->getValue('cat_name');
@@ -529,7 +529,7 @@ foreach($gProfileFields->getProfileFields() as $field)
             $field = getFieldCode($fieldNameIntern, $user);
             if(is_array($field) && $field['value'] !== '')
             {
-                $form->addStaticControl(strtolower($fieldNameIntern), $field['label'], $field['value']);
+                $form->addStaticControl(admStrToLower($fieldNameIntern), $field['label'], $field['value']);
             }
         }
     }
@@ -538,7 +538,7 @@ foreach($gProfileFields->getProfileFields() as $field)
 if($category !== '')
 {
     // new category then show last form and close div container
-    $page->addHtml($form->show());
+    $page->addHtml($form->show(false));
     $page->addHtml('</div></div>');
 }
 
@@ -932,11 +932,14 @@ if($gSettingsManager->getBool('members_enable_user_relations'))
                   FROM '.TBL_USER_RELATIONS.'
             INNER JOIN '.TBL_USER_RELATION_TYPES.'
                     ON ure_urt_id  = urt_id
+
+LEFT JOIN tbl_user_data UD on UD.usd_usr_id = ure_usr_id2 and usd_usf_id=26
+
                  WHERE ure_usr_id1 = ? -- $userId
                    AND urt_name        <> \'\'
                    AND urt_name_male   <> \'\'
                    AND urt_name_female <> \'\'
-              ORDER BY urt_name';
+              ORDER BY urt_name, UD.usd_value';
         $relationStatement = $gDb->queryPrepared($sql, array($userId));
 
         $relationtype = new TableUserRelationType($gDb);
@@ -1012,6 +1015,71 @@ if($gSettingsManager->getBool('members_enable_user_relations'))
         </div>');
     }
 }
+
+$sessionUser = new User($gDb, $gProfileFields, $currUsrId);
+$sessionRoles = $sessionUser->getRoleMemberships();
+if(in_array(3, $sessionRoles) || $getUserId == $currUsrId){
+    $page->addHtml('<div class="panel panel-default" id="datenkeller">
+            <div class="panel-heading"><div class="pull-left">Datenkeller</div></div>');
+    // find user directory
+    $dataDir = getDataDirForUser($getUserId, $page);
+	$foundDataFiles = array();
+	$foundPDFFiles = array();
+    $dataFiles=scandir($dataDir);
+    foreach($dataFiles as $dataFile){
+        if(!trim($dataFile)) continue;
+        if($dataFile=='..') continue;
+        if($dataFile=='.') continue;
+        if(substr($dataFile,-4)=='.tif') continue;
+        if(substr($dataFile,-4)=='.jpg' || substr($dataFile,-5)=='.jpeg'){
+            $foundDataFiles[] = $dataFile;
+        }
+        if(substr($dataFile,-4)=='.pdf'){
+            $foundPDFFiles[] = $dataFile;
+        }
+    }
+    if(sizeof($foundPDFFiles)){
+        $page->addHtml('<div style="padding:10px;">');
+        sort($foundPDFFiles);
+        foreach($foundPDFFiles as $dataFile){
+            $fs = filesize($dataDir.'/'.$dataFile);
+            $fm = filemtime($dataDir.'/'.$dataFile);
+            $page->addHtml('<A href="/admidio/public/pdf.php?userId='.$getUserId.'&cs='.md5($dataFile).'" target="_blank">'.
+                date('d.m.Y H:i', $fm). ' - '.
+                round($fs/1024,2).'kB - '.
+                $dataFile.
+                '</A><br>'
+            );
+        }
+        $page->addHtml('</div>');
+    }
+	sort($foundDataFiles);
+	foreach($foundDataFiles as $dataFile){
+        $page->addHtml('<img width="100%" src="/admidio/public/image.php?userId='.$getUserId.'&cs='.md5($dataFile).'"><br><hr>');
+	}
+
+	$form = <<<EOF
+    <form method="post" enctype="multipart/form-data" action="/admidio/public/fileupload.php">
+  <div>
+    <label for="profile_pic">Neue Datei hochladen</label>
+    <input
+      type="file"
+      id="file_id"
+      name="file"
+      accept=".jpg, .jpeg, .pdf" />
+      <input type="hidden" name="directory" value="####">
+      <input type="hidden" name="userid" value="$$$$">
+  </div>
+  <div>
+    <button>Hochladen</button>
+  </div>
+</form>
+EOF;
+	$page->addHtml(str_replace(array('####', '$$$$'), array($dataDir, $getUserId), $form));
+    //$page->addHtml(print_r($dataFiles, true));
+    $page->addHtml('</div>');
+}
+
 
 // show information about user who creates the recordset and changed it
 $page->addHtml(admFuncShowCreateChangeInfoById(

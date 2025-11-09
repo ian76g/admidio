@@ -87,9 +87,9 @@ class TableMenu extends TableAccess
         $value = parent::getValue($columnName, $format);
 
         // if text is a translation-id then translate it
-        if($columnName === 'men_name' && $format !== 'database' && Language::isTranslationStringId($value))
+        if($columnName === 'men_name' && $format !== 'database')
         {
-            $value = $gL10n->get($value);
+            $value = $gL10n->get(admStrToUpper($value));
         }
 
         return $value;

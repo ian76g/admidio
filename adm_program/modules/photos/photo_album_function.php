@@ -127,7 +127,7 @@ if ($getMode === 'new' || $getMode === 'change')
     // POST Variablen in das Role-Objekt schreiben
     foreach ($_POST as $key => $value) // TODO possible security issue
     {
-        if (StringUtils::strStartsWith($key, 'pho_'))
+        if (admStrStartsWith($key, 'pho_'))
         {
             $photoAlbum->setValue($key, $value);
         }

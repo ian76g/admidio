@@ -58,11 +58,49 @@ $htmlSubHeadline = '';
 $showLinkMailToList = true;
 $hasRightViewFormerMembers = true;
 
+$gDb->query('TRUNCATE tmp;');
+$sql = "INSERT IGNORE INTO tmp (
+select
+  M.mem_id,
+       YEAR(dat_begin)-YEAR(DATA.usd_value)-IF(STR_TO_DATE(CONCAT(YEAR(dat_begin), '-', MONTH(DATA.usd_value), '-', DAY(DATA.usd_value)) ,'%Y-%m-%d') > dat_begin, 1, 0) AS age
+from tbl_members M join tbl_roles R on M.mem_rol_id = R.rol_id and R.rol_cat_id = 3
+join tbl_dates D on D.dat_rol_id = R.rol_id
+left join tbl_user_relations REL on REL.ure_usr_id1 = M.mem_usr_id and REL.ure_urt_id in (2,8,9)
+left join tbl_user_data DATA on DATA.usd_usr_id = REL.ure_usr_id2 and DATA.usd_usf_id = 10
+group by D.dat_id, M.mem_usr_id);";
+$gDb->query($sql);
+$sql = "UPDATE tbl_members M join tmp T on M.mem_id = T.mem_id set M.mem_age_triplets = T.age;";
+$gDb->query($sql);
+
+$gDb->query('TRUNCATE tmp2');
+$sql = "INSERT IGNORE INTO tmp2 (
+select
+  M.mem_id,
+       YEAR(CURDATE())-YEAR(DATA.usd_value)-IF(STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-', MONTH(DATA.usd_value), '-', DAY(DATA.usd_value)) ,'%Y-%m-%d') > CURDATE(), 1, 0) AS age
+from tbl_members M join tbl_roles R on M.mem_rol_id = R.rol_id and R.rol_cat_id in (6,18)
+left join tbl_user_relations REL on REL.ure_usr_id1 = M.mem_usr_id and REL.ure_urt_id = (2,8,9)
+left join tbl_user_data DATA on DATA.usd_usr_id = REL.ure_usr_id2 and DATA.usd_usf_id = 10)";
+$gDb->query($sql);
+$sql = "UPDATE tbl_members M join tmp2 T on M.mem_id = T.mem_id set M.mem_age_triplets = T.age";
+$gDb->query($sql);
+
+$sql = "update
+tbl_members join tbl_user_relations on mem_usr_id = ure_usr_id1
+set mem_grade = CASE
+                        WHEN ure_urt_id = 2 THEN 3
+                        WHEN ure_urt_id = 8 THEN 4
+                        WHEN ure_urt_id = 9 THEN 5
+                        ELSE NULL
+                    END
+where mem_rol_id = 5 and ure_urt_id in (2,8,9)";
+$gDb->query($sql);
+
+
 if ($numberRoles > 1)
 {
     $sql = 'SELECT rol_id, rol_name, rol_valid
               FROM '.TBL_ROLES.'
-             WHERE rol_id IN ('.Database::getQmForValues($roleIds).')';
+             WHERE rol_id IN ('.replaceValuesArrWithQM($roleIds).')';
     $rolesStatement = $gDb->queryPrepared($sql, $roleIds);
     $rolesData      = $rolesStatement->fetchAll();
 
@@ -173,7 +211,7 @@ if (count($relationTypeIds) > 0)
 {
     $sql = 'SELECT urt_id, urt_name
               FROM '.TBL_USER_RELATION_TYPES.'
-             WHERE urt_id IN ('.Database::getQmForValues($relationTypeIds).')
+             WHERE urt_id IN ('.replaceValuesArrWithQM($relationTypeIds).')
           ORDER BY urt_name';
     $relationTypesStatement = $gDb->queryPrepared($sql, $relationTypeIds);
 
@@ -248,6 +286,7 @@ $arrColName = array(
     'mem_usr_id_change'    => $gL10n->get('LST_USER_CHANGED'),
     'mem_timestamp_change' => $gL10n->get('SYS_CHANGED_AT'),
     'mem_comment'          => $gL10n->get('SYS_COMMENT'),
+    'mem_age_triplets'     => $gL10n->get('DAT_AGE_TRIPLETS'),
     'mem_count_guests'     => $gL10n->get('LST_SEAT_AMOUNT')
 );
 
@@ -279,7 +318,7 @@ $membersList = $listStatement->fetchAll(\PDO::FETCH_BOTH);
 if ($numMembers === 0)
 {
     // Es sind keine Daten vorhanden !
-    $gMessage->show($gL10n->get('LST_NO_USER_FOUND'));
+    $gMessage->show($gL10n->get('LST_NO_USER_FOUND')); //.'<br>'.$mainSql);
     // => EXIT
 }
 
@@ -316,7 +355,7 @@ elseif (count($relationTypeIds) > 1)
 }
 
 // if html mode and last url was not a list view then save this url to navigation stack
-if ($getMode === 'html' && !StringUtils::strContains($gNavigation->getUrl(), 'lists_show.php'))
+if ($getMode === 'html' && !admStrContains($gNavigation->getUrl(), 'lists_show.php'))
 {
     $gNavigation->addUrl(CURRENT_URL);
 }
@@ -431,7 +470,7 @@ if ($getMode !== 'csv')
             $form->addInput('rol_ids', '', $getRoleIds, array('property' => HtmlForm::FIELD_HIDDEN));
             $form->addCheckbox('show_former_members', $gL10n->get('LST_SHOW_FORMER_MEMBERS_ONLY'), $getShowFormerMembers);
             $form->addSubmitButton('btn_send', $gL10n->get('SYS_OK'));
-            $filterNavbar->addForm($form->show());
+            $filterNavbar->addForm($form->show(false));
             $page->addHtml($filterNavbar->show());
         }
 
@@ -515,7 +554,7 @@ if ($getMode !== 'csv')
             'csv-oo' => $gL10n->get('SYS_CSV').' ('.$gL10n->get('SYS_UTF8').')'
         );
         $form->addSelectBox('export_list_to', '', $selectBoxEntries, array('showContextDependentFirstEntry' => false));
-        $listsMenu->addForm($form->show());
+        $listsMenu->addForm($form->show(false));
 
         $table = new HtmlTable('adm_lists_table', $page, $hoverRows, $datatable, $classTable);
         $table->setDatatablesRowsPerPage($gSettingsManager->getInt('lists_members_per_page'));
@@ -1024,7 +1063,7 @@ elseif ($getMode === 'html' || $getMode === 'print')
             {
                 $form->addStaticControl('infobox_max_participants', $gL10n->get('SYS_MAX_PARTICIPANTS'), $role->getValue('rol_max_members'));
             }
-            $htmlBox .= $form->show();
+            $htmlBox .= $form->show(false);
             $htmlBox .= '</div>
             </div>';
         } // end of infobox

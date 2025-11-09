@@ -69,13 +69,13 @@ if($getMode === 'change')
     {
         if(strlen($newPassword) >= PASSWORD_MIN_LENGTH)
         {
-            if (PasswordUtils::passwordStrength($newPassword, $user->getPasswordUserData()) >= $gSettingsManager->getInt('password_min_strength'))
+            if (PasswordHashing::passwordStrength($newPassword, $user->getPasswordUserData()) >= $gSettingsManager->getInt('password_min_strength'))
             {
                 if ($newPassword === $newPasswordConfirm)
                 {
                     // check if old password is correct.
                     // Administrator could change password of other users without this verification.
-                    if (PasswordUtils::verify($oldPassword, $user->getValue('usr_password'))
+                    if (PasswordHashing::verify($oldPassword, $user->getValue('usr_password'))
                     || ($gCurrentUser->isAdministrator() && $currUsrId !== $getUserId))
                     {
                         $user->saveChangesWithoutRights();
@@ -212,6 +212,6 @@ elseif($getMode === 'html')
             'btn_save', $gL10n->get('SYS_SAVE'),
             array('icon' => THEME_URL.'/icons/disk.png', 'class' => ' col-sm-offset-3')
         );
-        echo $form->show();
+        $form->show();
     echo '</div>';
 }

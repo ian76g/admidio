@@ -78,3 +78,12 @@ function ProfileJS(gRootPath) {
         $("#membership_period_" + memberId).css({"visibility": "hidden", "display": "none"});
     };
 }
+
+/**
+ * @deprecated 3.2.0:4.0.0
+ */
+function profileJSClass() {
+    /** global: gRootPath */
+    console.warn('DEPRECATED: "profileJSClass()" is deprecated, use "ProfileJS(gRootPath)" instead!');
+    return ProfileJS(gRootPath);
+}

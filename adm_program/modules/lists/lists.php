@@ -40,15 +40,20 @@ else
 }
 
 // only users with the right to assign roles can view inactive roles
-if(!$gCurrentUser->checkRolesRight('rol_assign_roles'))
+// within PHP 5.3 false will not be set and therefore we must add 0 as value
+if($getActiveRole || !$gCurrentUser->checkRolesRight('rol_assign_roles'))
 {
-    $getActiveRole = true;
+    $getActiveRole = 1;
+}
+else
+{
+    $getActiveRole = 0;
 }
 
 // New Modulelist object
 $lists = new ModuleLists();
 $lists->setParameter('cat_id', $getCatId);
-$lists->setParameter('active_role', (int) $getActiveRole);
+$lists->setParameter('active_role', $getActiveRole);
 
 if($getCatId > 0)
 {
@@ -73,7 +78,7 @@ $page->addJavascript('
         roleId    = elementId.substr(elementId.search(/_/) + 1);
 
         if ($(this).val() === "mylist") {
-            self.location.href = "' . safeUrl(ADMIDIO_URL . FOLDER_MODULES . '/lists/mylist.php', array('active_role' => (int) $getActiveRole)) . '&rol_id=" + roleId;
+            self.location.href = "' . safeUrl(ADMIDIO_URL . FOLDER_MODULES . '/lists/mylist.php', array('active_role' => $getActiveRole)) . '&rol_id=" + roleId;
         } else {
             self.location.href = "' . safeUrl(ADMIDIO_URL . FOLDER_MODULES . '/lists/lists_show.php', array('mode' => 'html')) . '&lst_id=" + $(this).val() + "&rol_ids=" + roleId;
         }
@@ -102,12 +107,12 @@ if($gCurrentUser->manageRoles() && !$gCurrentUser->isAdministrator())
 }
 
 $page->addJavascript('$("#cat_id").change(function() { $("#navbar_cat_id_form").submit(); });', true);
-$navbarForm = new HtmlForm('navbar_cat_id_form', safeUrl(ADMIDIO_URL.FOLDER_MODULES.'/lists/lists.php', array('active_role' => (int) $getActiveRole)), $page, array('type' => 'navbar', 'setFocus' => false));
+$navbarForm = new HtmlForm('navbar_cat_id_form', safeUrl(ADMIDIO_URL.FOLDER_MODULES.'/lists/lists.php', array('active_role' => $getActiveRole)), $page, array('type' => 'navbar', 'setFocus' => false));
 $navbarForm->addSelectBoxForCategories(
     'cat_id', $gL10n->get('SYS_CATEGORY'), $gDb, 'ROL', HtmlForm::SELECT_BOX_MODUS_FILTER,
     array('defaultValue' => $getCatId)
 );
-$listsMenu->addForm($navbarForm->show());
+$listsMenu->addForm($navbarForm->show(false));
 
 if($gCurrentUser->isAdministrator())
 {
@@ -317,7 +322,7 @@ foreach($listsResult['recordset'] as $row)
                     $form->addStaticControl('list_cost_period', $gL10n->get('SYS_CONTRIBUTION_PERIOD'), TableRoles::getCostPeriods($role->getValue('rol_cost_period')));
                 }
 
-                $page->addHtml($form->show());
+                $page->addHtml($form->show(false));
             $page->addHtml('</div>
         </div>
     </div>');
@@ -329,7 +334,7 @@ if($listsResult['numResults'] > 0)
 }
 
 // If necessary show links to navigate to next and previous recordsets of the query
-$baseUrl = safeUrl(ADMIDIO_URL.FOLDER_MODULES.'/lists/lists.php', array('cat_id' => $getCatId, 'active_role' => (int) $getActiveRole));
+$baseUrl = safeUrl(ADMIDIO_URL.FOLDER_MODULES.'/lists/lists.php', array('cat_id' => $getCatId, 'active_role' => $getActiveRole));
 $page->addHtml(admFuncGeneratePagination($baseUrl, $listsResult['totalCount'], $gSettingsManager->getInt('lists_roles_per_page'), $getStart));
 
 $page->addHtml('</div>');

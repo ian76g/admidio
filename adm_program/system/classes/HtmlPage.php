@@ -100,7 +100,7 @@ class HtmlPage
         $this->setHeadline($headline);
 
         $this->addCssFile(ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/bootstrap/css/bootstrap.css');
-        $this->addJavascriptFile(ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/jquery/dist/jquery.js');
+        $this->addJavascriptFile(ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/jquery/jquery.js');
         $this->addJavascriptFile(ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/bootstrap/js/bootstrap.js');
         $this->addJavascriptFile(ADMIDIO_URL . '/adm_program/system/js/common_functions.js');
     }
@@ -113,7 +113,7 @@ class HtmlPage
     {
         if (!in_array($cssFile, $this->cssFiles, true))
         {
-            if (StringUtils::strStartsWith($cssFile, 'http'))
+            if (admStrStartsWith($cssFile, 'http'))
             {
                 $this->cssFiles[] = $cssFile;
             }
@@ -149,7 +149,7 @@ class HtmlPage
     {
         if (!in_array($jsFile, $this->jsFiles, true))
         {
-            if (StringUtils::strStartsWith($jsFile, 'http'))
+            if (admStrStartsWith($jsFile, 'http'))
             {
                 $this->jsFiles[] = $jsFile;
             }
@@ -206,8 +206,9 @@ class HtmlPage
         global $gSettingsManager;
 
         // add admidio css file at last because there the user can redefine all css
-        $this->addCssFile(THEME_URL . '/css/admidio.css');
-        $this->addCssFile(ADMIDIO_URL . '/adm_plugins/calendar/calendar.css');
+        $this->addCssFile(THEME_URL.'/css/admidio.css');
+        $this->addCssFile(ADMIDIO_URL.'/adm_plugins/birthday/birthday.css');
+        $this->addCssFile(ADMIDIO_URL.'/adm_plugins/calendar/calendar.css');
 
         // if print mode is set then add a print specific css file
         if ($this->printMode)
@@ -399,9 +400,10 @@ class HtmlPage
     private function getFileContent($filename)
     {
         global $gLogger, $gL10n, $gDb, $gCurrentSession, $gCurrentOrganization, $gCurrentUser;
-        global $gValidLogin, $gProfileFields, $gHomepage, $gSettingsManager;
+        global $gValidLogin, $gProfileFields, $gHomepage, $gDbType, $gSettingsManager;
+        global $g_root_path, $gPreferences;
 
-        $filePath = THEME_PATH . '/' . $filename;
+        $filePath = THEME_ADMIDIO_PATH . '/' . $filename;
         if (!is_file($filePath))
         {
             $gLogger->error('THEME: Theme file "' . $filename . '" not found!', array('filePath' => $filePath));
@@ -433,6 +435,12 @@ class HtmlPage
         {
             $headerContent .= '<link rel="stylesheet" type="text/css" href="' . $cssFile . '" />';
         }
+
+        // add some special scripts so that ie8 could better understand the Bootstrap 3 framework
+        $headerContent .= '<!--[if lt IE 9]>
+            <script src="' . ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/html5shiv/html5shiv.min.js"></script>
+            <script src="' . ADMIDIO_URL . FOLDER_LIBS_CLIENT . '/respond/respond.min.js"></script>
+        <![endif]-->';
 
         // add javascript files to page
         foreach ($this->jsFiles as $jsFile)
@@ -471,7 +479,7 @@ class HtmlPage
             </script>';
         }
 
-        if ((bool) $gSettingsManager->get('system_cookie_note'))
+        if ($gSettingsManager->has('system_cookie_note') && $gSettingsManager->getBool('system_cookie_note'))
         {
             if ($gSetCookieForDomain)
             {
@@ -741,20 +749,31 @@ class HtmlPage
     }
 
     /**
-     * This method send the whole html code of the page to the browser.
-     * Call this method if you have finished your page layout.
+     * This method send the whole html code of the page to the browser. Call this method
+     * if you have finished your page layout.
+     * @param bool $directOutput If set to **true** (default) the html page will be directly send
+     *                           to the browser. If set to **false** the html will be returned.
+     * @return string|void If $directOutput is set to **false** this method will return the html code of the page.
      */
-    public function show()
+    public function show($directOutput = true)
     {
         $this->addMainFilesAndContent();
 
-        // now show the complete html of the page
-        header('Content-type: text/html; charset=utf-8');
+        $html = '<!DOCTYPE html><html>';
+        $html .= $this->getHtmlHeader();
+        $html .= $this->getHtmlBody();
+        $html .= '</html>';
 
-        echo '<!DOCTYPE html><html>';
-        echo $this->getHtmlHeader();
-        echo $this->getHtmlBody();
-        echo '</html>';
+        // now show the complete html of the page
+        if ($directOutput)
+        {
+            header('Content-type: text/html; charset=utf-8');
+            echo $html;
+        }
+        else
+        {
+            return $html;
+        }
     }
 
     /**

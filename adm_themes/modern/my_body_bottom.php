@@ -10,6 +10,10 @@
                 <?php
 
                 require(ADMIDIO_PATH . FOLDER_PLUGINS . '/login_form/login_form.php');
+                require(ADMIDIO_PATH . FOLDER_PLUGINS . '/sidebar_online/sidebar_online.php');
+                require(ADMIDIO_PATH . FOLDER_PLUGINS . '/sidebar_dates/sidebar_dates.php');
+                require(ADMIDIO_PATH . FOLDER_PLUGINS . '/calendar/calendar.php');
+                require(ADMIDIO_PATH . FOLDER_PLUGINS . '/birthday/birthday.php');
 
                 // create html page object and display Menu
                 $page = new HtmlPage();

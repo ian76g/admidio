@@ -14,7 +14,7 @@
 //     Besucher erhalten nur einen Hinweis das X Leute Geburtstag haben
 // 1 = Name und Alter werden auch fuer Besucher angezeigt
 // 2 = (Default) Name ohne Alter wird für Besucher angezeigt
-$plg_show_names_extern = 2;
+$plg_show_names_extern = 0;
 
 // Wie soll der Name des Geburtstagskindes angezeigt werden ?
 // 1 = (Default) Vorname Nachname  (Hans Mustermann)
@@ -27,7 +27,7 @@ $plg_show_names = 1;
 // die Anrede ersetzt werden?
 // Falls nicht festgelegt, wird im PlugIn 18 als Default gesetzt.
 // Falls Funktion nicht gewünscht, Alter einfach z.B. auf 99 setzen.
-$plg_show_alter_anrede = 18;
+$plg_show_alter_anrede = 99;
 
 // Soll der Hinweis darauf, dass es keine Geburtstagskinder gibt, entfallen?
 // 0 = (Default) Hinweis wird angezeigt
@@ -35,9 +35,9 @@ $plg_show_alter_anrede = 18;
 $plg_show_hinweis_keiner = 0;
 
 // zeige alle geburtstage in den letzten x tagen
-$plg_show_zeitraum = 5;
+$plg_show_zeitraum = 0;
 // zeige zukünftige geburtstage
-$plg_show_future = 10;
+$plg_show_future = 0;
 
 // Soll die E-Mail-Adresse fuer Besucher verlinkt sein ?
 // Bei registrierten Benutzern wird immer ein Link auf das Mailmodul gesetzt

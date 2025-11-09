@@ -272,13 +272,26 @@ if($plg_geb_aktiv)
 {
     if(DB_ENGINE === Database::PDO_ENGINE_PGSQL || DB_ENGINE === 'postgresql') // for backwards compatibility "postgresql"
     {
+        $sqlYearOfBirthday = ' date_part(\'year\', timestamp birthday.usd_value) ';
         $sqlMonthOfBirthday = ' date_part(\'month\', timestamp birthday.usd_value) ';
         $sqlDayOfBirthday   = ' date_part(\'day\', timestamp birthday.usd_value) ';
     }
     else
     {
+        $sqlYearOfBirthday = ' YEAR(birthday.usd_value) ';
         $sqlMonthOfBirthday = ' MONTH(birthday.usd_value) ';
         $sqlDayOfBirthday   = ' DayOfMonth(birthday.usd_value) ';
+    }
+
+    switch($plg_geb_displayNames) {
+        case 1: $sqlOrderName = 'first_name';
+            break;
+        case 2: $sqlOrderName = 'last_name';
+            break;
+        case 0:
+        default:
+                $sqlOrderName = 'last_name, first_name';
+            break;
     }
 
     // database query for all birthdays of this month
@@ -306,7 +319,7 @@ if($plg_geb_aktiv)
                AND rol_id '.$sqlRoleIds.'
                AND mem_begin <= ? -- DATE_NOW
                AND mem_end    > ? -- DATE_NOW
-          ORDER BY '.$sqlMonthOfBirthday.' ASC, '.$sqlMonthOfBirthday.' ASC, last_name, first_name';
+          ORDER BY '.$sqlYearOfBirthday.' DESC,' . $sqlMonthOfBirthday.' ASC, '.$sqlDayOfBirthday.' ASC, '. $sqlOrderName;
 
     $queryParams = array(
         $gProfileFields->getProperty('BIRTHDAY', 'usf_id'),
@@ -321,12 +334,23 @@ if($plg_geb_aktiv)
 
     while($row = $birthdayStatement->fetch())
     {
-        $birthdayDate = new \DateTime($row['birthday']);
+        $birthdayDate = new \DateTime(date('d.m.Y', strtotime($row['birthday'])));
+
+        switch($plg_geb_displayNames) {
+            case 1: $name = $row['first_name'];
+                    break;
+            case 2: $name = $row['last_name'];
+
+            case 0:
+            default:
+                $name = $row['last_name']. ($row['last_name']?', ':'') . $row['first_name'];
+                break;
+        }
 
         $birthdaysMonthDayArray[$birthdayDate->format('j')][] = array(
             'year' => $birthdayDate->format('Y'),
             'age'  => $currentYear - $birthdayDate->format('Y'),
-            'name' => $row['last_name']. ', '. $row['first_name']
+            'name' => $name
         );
     }
 }
@@ -361,9 +385,9 @@ echo '<div id="plgCalendarContent" class="admidio-plugin-content">
 
 <table border="0" id="plgCalendarTable">
     <tr>';
-if($plg_ajax_change)
-{
-    echo '<th style="text-align: center;" class="plgCalendarHeader"><a href="#" onclick="$.get({
+        if($plg_ajax_change)
+        {
+            echo '<th style="text-align: center;" class="plgCalendarHeader"><a href="#" onclick="$.get({
                 url: \'' . ADMIDIO_URL . FOLDER_PLUGINS . '/' . $pluginFolder . '/calendar.php\',
                 cache: false,
                 data: \'ajax_change&amp;date_id='.date('mY', mktime(0, 0, 0, $currentMonth - 1, 1, $currentYear)).'\',
@@ -372,8 +396,8 @@ if($plg_ajax_change)
                     $(\'.admidio-calendar-link\').popover();
                 }
             }); return false;">&laquo;</a></th>';
-    echo '<th colspan="5" style="text-align: center;" class="plgCalendarHeader">'.$months[$currentMonth - 1].' '.$currentYear.'</th>';
-    echo '<th style="text-align: center;" class="plgCalendarHeader"><a href="#" onclick="$.get({
+            echo '<th colspan="5" style="text-align: center;" class="plgCalendarHeader">'.$months[$currentMonth - 1].' '.$currentYear.'</th>';
+            echo '<th style="text-align: center;" class="plgCalendarHeader"><a href="#" onclick="$.get({
                 url: \'' . ADMIDIO_URL . FOLDER_PLUGINS . '/' . $pluginFolder . '/calendar.php\',
                 cache: false,
                 data: \'ajax_change&amp;date_id='.date('mY', mktime(0, 0, 0, $currentMonth + 1, 1, $currentYear)).'\',
@@ -382,12 +406,12 @@ if($plg_ajax_change)
                     $(\'.admidio-calendar-link\').popover();
                 }
             }); return false;">&raquo;</a></th>';
-}
-else
-{
-    echo '<th colspan="7" align="center" class="plgCalendarHeader">'.$months[$currentMonth - 1].' '.$currentYear.'</th>';
-}
-echo '</tr>
+        }
+        else
+        {
+            echo '<th colspan="7" align="center" class="plgCalendarHeader">'.$months[$currentMonth - 1].' '.$currentYear.'</th>';
+        }
+    echo '</tr>
     <tr>
         <td class="plgCalendarWeekday"><strong>'.$gL10n->get('PLG_CALENDAR_MONDAY_SHORT').'</strong></td>
         <td class="plgCalendarWeekday"><strong>'.$gL10n->get('PLG_CALENDAR_TUESDAY_SHORT').'</strong></td>
@@ -660,3 +684,8 @@ if($currentMonth.$currentYear !== date('mY'))
         }); return false;">'.$gL10n->get('PLG_CALENDAR_CURRENT_MONTH').'</a></div>';
 }
 echo '</div>';
+echo '<script type="text/javascript"><!--
+    $(document).ready(function() {
+        $(".admidio-calendar-link").popover();
+    });
+    --></script>';

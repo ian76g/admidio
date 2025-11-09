@@ -148,6 +148,8 @@ class Email extends PHPMailer
      */
     public function addRecipient($address, $name = '')
     {
+        $address = admStrToLower($address);
+
         try
         {
             $this->addAddress($address, $name);
@@ -170,6 +172,8 @@ class Email extends PHPMailer
      */
     public function addCopy($address, $name = '')
     {
+        $address = admStrToLower($address);
+
         try
         {
             $this->addCC($address, $name);
@@ -193,6 +197,7 @@ class Email extends PHPMailer
      */
     public function addBlindCopy($address, $name = '')
     {
+        $address = admStrToLower($address);
         // Blindcopy must be Ascii-US formated, so encode in MimeHeader
         $asciiName = stripslashes($name);
 
@@ -307,6 +312,8 @@ class Email extends PHPMailer
     {
         global $gSettingsManager;
 
+        $address = admStrToLower($address);
+
         // save sender if a copy of the mail should be send to him
         $this->emSender = array('address' => $address, 'name' => $name);
 
@@ -393,6 +400,7 @@ class Email extends PHPMailer
      */
     public function setSenderInText($senderName, $receivers)
     {
+        return;
         global $gL10n, $gValidLogin, $gCurrentOrganization;
 
         $senderText = $gL10n->get('MAI_EMAIL_SEND_TO_RECEIVER', array($senderName, $gCurrentOrganization->getValue('org_homepage'), $receivers));
@@ -416,6 +424,7 @@ class Email extends PHPMailer
     public function sendDataAsHtml()
     {
         $this->emSendAsHTML = true;
+        $this->emSendAsHTML = false;
     }
 
     /**
@@ -519,7 +528,7 @@ class Email extends PHPMailer
     public function sendEmail()
     {
         // Text in Nachricht einfügen
-        if ($this->emSendAsHTML)
+        if (false && $this->emSendAsHTML)
         {
             $this->msgHTML($this->emHtmlText);
         }
@@ -557,5 +566,39 @@ class Email extends PHPMailer
         $this->clearAddresses();
 
         return true;
+    }
+
+    /**
+     * Mailbenachrichtigung für Admin
+     * @deprecated 3.3.0:4.0.0 "adminNotfication()" is a typo. Use "adminNotification()" instead.
+     * @param string $subject
+     * @param string $message
+     * @param string $editorName
+     * @param string $editorEmail
+     * @throws AdmException 'SYS_EMAIL_NOT_SEND'
+     * @return bool|string
+     */
+    public function adminNotfication($subject, $message, $editorName = '', $editorEmail = '')
+    {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$email->adminNotfication()" is deprecated, use "$email->adminNotification()" instead!');
+
+        return $this->adminNotification($subject, $message, $editorName, $editorEmail);
+    }
+
+    /**
+     * Returns the maximum size of an attachment
+     * @deprecated 3.3.0:4.0.0 "getMaxAttachementSize()" is a typo. Use "getMaxAttachmentSize()" instead.
+     * @param string $sizeUnit 'b' = byte, 'kib' = kilobyte, 'mib' = megabyte, 'gib' = gigabyte, 'tib' = terabyte
+     * @return float The maximum attachment size in the given size-unit
+     */
+    public static function getMaxAttachementSize($sizeUnit = self::SIZE_UNIT_MEBIBYTE)
+    {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "Email::getMaxAttachementSize()" is deprecated, use "Email::getMaxAttachmentSize()" instead!');
+
+        return self::getMaxAttachmentSize($sizeUnit);
     }
 }

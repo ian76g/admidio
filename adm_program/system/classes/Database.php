@@ -130,13 +130,16 @@ class Database
     {
         global $gLogger;
 
-        $gLogger->debug(
-            'DATABASE: Create DB-Instance with default params!',
-            array(
-                'engine' => DB_ENGINE, 'host' => DB_HOST, 'port' => DB_PORT,
-                'name' => DB_NAME, 'username' => DB_USERNAME, 'password' => DB_PASSWORD
-            )
-        );
+        if ($gLogger instanceof \Psr\Log\LoggerInterface) // fix for non-object error in PHP 5.3
+        {
+            $gLogger->debug(
+                'DATABASE: Create DB-Instance with default params!',
+                array(
+                    'engine' => DB_ENGINE, 'host' => DB_HOST, 'port' => DB_PORT,
+                    'name' => DB_NAME, 'username' => DB_USERNAME, 'password' => DB_PASSWORD
+                )
+            );
+        }
 
         return new self(DB_ENGINE, DB_HOST, DB_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD);
     }
@@ -157,6 +160,14 @@ class Database
     {
         global $gLogger;
 
+        // for compatibility to old versions accept the string postgresql
+        if ($engine === 'postgresql')
+        {
+            $gLogger->warning('DEPRECATED: Deprecated database engine type used!', array('engine' => $engine));
+
+            $engine = self::PDO_ENGINE_PGSQL;
+        }
+
         $this->engine   = $engine;
         $this->host     = $host;
         $this->port     = $port;
@@ -167,7 +178,10 @@ class Database
 
         $this->connect();
 
-        $gLogger->debug('DATABASE: connected!');
+        if ($gLogger instanceof \Psr\Log\LoggerInterface) // fix for non-object error in PHP 5.3
+        {
+            $gLogger->debug('DATABASE: connected!');
+        }
     }
 
     /**
@@ -179,7 +193,10 @@ class Database
     {
         global $gLogger;
 
-        $gLogger->debug('DATABASE: sleep/serialize!');
+        if ($gLogger instanceof \Psr\Log\LoggerInterface) // fix for non-object error in PHP 5.3
+        {
+            $gLogger->debug('DATABASE: sleep/serialize!');
+        }
 
         return array('engine', 'host', 'port', 'dbName', 'username', 'password', 'options');
     }
@@ -270,6 +287,21 @@ class Database
     public function escapeString($string)
     {
         return $this->pdo->quote($string);
+    }
+
+    /**
+     * Returns an array with all available PDO database drivers of the server.
+     * @deprecated 3.1.0:4.0.0 Switched to native PDO method.
+     * @return array<int,string> Returns an array with all available PDO database drivers of the server.
+     * @see <a href="https://secure.php.net/manual/en/pdo.getavailabledrivers.php">PDO::getAvailableDrivers</a>
+     */
+    public static function getAvailableDBs()
+    {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->getAvailableDBs()" is deprecated, use "\PDO::getAvailableDrivers()" instead!');
+
+        return \PDO::getAvailableDrivers();
     }
 
     /**
@@ -466,18 +498,18 @@ class Database
                     'null'     => $properties['Null'] === 'YES',
                     'key'      => $properties['Key'] === 'PRI' || $properties['Key'] === 'MUL',
                     'default'  => $properties['Default'],
-                    'unsigned' => StringUtils::strContains($properties['Type'], 'unsigned')
+                    'unsigned' => admStrContains($properties['Type'], 'unsigned')
                 );
 
-                if (StringUtils::strContains($properties['Type'], 'tinyint(1)'))
+                if (admStrContains($properties['Type'], 'tinyint(1)'))
                 {
                     $props['type'] = 'boolean';
                 }
-                elseif (StringUtils::strContains($properties['Type'], 'smallint'))
+                elseif (admStrContains($properties['Type'], 'smallint'))
                 {
                     $props['type'] = 'smallint';
                 }
-                elseif (StringUtils::strContains($properties['Type'], 'int'))
+                elseif (admStrContains($properties['Type'], 'int'))
                 {
                     $props['type'] = 'integer';
                 }
@@ -500,18 +532,18 @@ class Database
             foreach ($columnsList as $properties)
             {
                 $props = array(
-                    'serial'   => StringUtils::strContains($properties['column_default'], 'nextval'),
+                    'serial'   => admStrContains($properties['column_default'], 'nextval'),
                     'null'     => $properties['is_nullable'] === 'YES',
                     'key'      => null,
                     'default'  => $properties['column_default'],
                     'unsigned' => null
                 );
 
-                if (StringUtils::strContains($properties['data_type'], 'timestamp'))
+                if (admStrContains($properties['data_type'], 'timestamp'))
                 {
                     $props['type'] = 'timestamp';
                 }
-                elseif (StringUtils::strContains($properties['data_type'], 'time'))
+                elseif (admStrContains($properties['data_type'], 'time'))
                 {
                     $props['type'] = 'time';
                 }
@@ -552,13 +584,15 @@ class Database
      */
     private function preparePgSqlQuery($sql)
     {
+        $sqlCompare = strtolower($sql);
+
         // prepare the sql statement to be compatible with PostgreSQL
-        if (StringUtils::strContains($sql, 'CREATE TABLE', false))
+        if (admStrContains($sqlCompare, 'create table'))
         {
             // on a create-table-statement if necessary cut existing MySQL table options
             $sql = substr($sql, 0, strrpos($sql, ')') + 1);
         }
-        if (StringUtils::strContains($sql, 'CREATE TABLE', false) || StringUtils::strContains($sql, 'ALTER TABLE', false))
+        if (admStrContains($sqlCompare, 'create table') || admStrContains($sqlCompare, 'alter table'))
         {
             $replaces = array(
                 // PostgreSQL doesn't know unsigned
@@ -568,7 +602,7 @@ class Database
                 // A blob is in PostgreSQL a bytea datatype
                 'blob'     => 'bytea'
             );
-            $sql = StringUtils::strMultiReplace($sql, $replaces);
+            $sql = admStrMultiReplace($sql, $replaces);
 
             // Auto_Increment must be replaced with Serial
             $posAutoIncrement = strpos($sql, 'AUTO_INCREMENT');
@@ -636,7 +670,7 @@ class Database
         {
             $this->pdoStatement = $this->pdo->query($sql);
 
-            if ($this->pdoStatement !== false && StringUtils::strStartsWith($sql, 'SELECT', false))
+            if ($this->pdoStatement !== false && admStrStartsWith(strtoupper($sql), 'SELECT'))
             {
                 $gLogger->debug('SQL: Found rows: ' . $this->pdoStatement->rowCount());
             }
@@ -698,7 +732,7 @@ class Database
             {
                 $this->pdoStatement->execute($params);
 
-                if (StringUtils::strStartsWith($sql, 'SELECT', false))
+                if (admStrStartsWith(strtoupper($sql), 'SELECT'))
                 {
                     $gLogger->info('SQL: Found rows: ' . $this->pdoStatement->rowCount());
                 }
@@ -724,16 +758,6 @@ class Database
         }
 
         return $this->pdoStatement;
-    }
-
-    /**
-     * Get an string with question marks that are comma separated.
-     * @param array<int,mixed> $valuesArray An array with the values that should be replaced with question marks
-     * @return string Question marks string
-     */
-    public static function getQmForValues(array $valuesArray)
-    {
-        return implode(',', array_fill(0, count($valuesArray), '?'));
     }
 
     /**
@@ -962,5 +986,138 @@ class Database
         }
 
         return $sqlStatements;
+    }
+
+
+    /**
+     * Fetch a result row as an associative array, a numeric array, or both.
+     * @deprecated 3.1.0:4.0.0 Switched to native PDO method.
+     *             Please use the PHP class <a href="https://secure.php.net/manual/en/class.pdostatement.php">\PDOStatement</a>
+     *             and the method <a href="https://secure.php.net/manual/en/pdostatement.fetch.php">fetch</a> instead.
+     * @param \PDOStatement $pdoStatement An object of the class \PDOStatement. This should be set if multiple
+     *                                    rows where selected and other sql statements are also send to the database.
+     * @param int           $fetchType    Set the result type. Can contain **\PDO::FECTH_ASSOC** for an associative array,
+     *                                    **\PDO::FETCH_NUM** for a numeric array or **\PDO::FETCH_BOTH** (Default).
+     * @return mixed|null Returns an array that corresponds to the fetched row and moves the internal data pointer ahead.
+     * @see <a href="https://secure.php.net/manual/en/pdostatement.fetch.php">\PDOStatement::fetch</a>
+     */
+    public function fetch_array(\PDOStatement $pdoStatement = null, $fetchType = \PDO::FETCH_BOTH)
+    {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->fetch_array()" is deprecated, use "$this->pdoStatement->fetch()" instead!');
+
+        // if pdo statement is committed then fetch this object
+        if ($pdoStatement instanceof \PDOStatement)
+        {
+            return $pdoStatement->fetch($fetchType);
+        }
+        // if no pdo statement was committed then take the one from the last query
+        if ($this->pdoStatement instanceof \PDOStatement)
+        {
+            return $this->pdoStatement->fetch($fetchType);
+        }
+
+        return null;
+    }
+
+    /**
+     * Fetch a result row as an object.
+     * @deprecated 3.1.0:4.0.0 Switched to native PDO method.
+     *             Please use methods Database#fetchAll or Database#fetch instead.
+     *             Please use the PHP class <a href="https://secure.php.net/manual/en/class.pdostatement.php">\PDOStatement</a>
+     *             and the method <a href="https://secure.php.net/manual/en/pdostatement.fetchobject.php">fetchObject</a> instead.
+     * @param \PDOStatement $pdoStatement An object of the class \PDOStatement. This should be set if multiple
+     *                                    rows where selected and other sql statements are also send to the database.
+     * @return mixed|null Returns an object that corresponds to the fetched row and moves the internal data pointer ahead.
+     * @see <a href="https://secure.php.net/manual/en/pdostatement.fetchobject.php">\PDOStatement::fetchObject</a>
+     */
+    public function fetch_object(\PDOStatement $pdoStatement = null)
+    {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->fetch_object()" is deprecated, use "$this->pdoStatement->fetchObject()" instead!');
+
+        // if pdo statement is committed then fetch this object
+        if ($pdoStatement instanceof \PDOStatement)
+        {
+            return $pdoStatement->fetchObject();
+        }
+        // if no pdo statement was committed then take the one from the last query
+        if ($this->pdoStatement instanceof \PDOStatement)
+        {
+            return $this->pdoStatement->fetchObject();
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the ID of the unique id column of the last INSERT operation.
+     * @deprecated 3.1.0:4.0.0 Renamed method to camelCase style.
+     *             Please use methods Database#lastInsertId instead.
+     * @return int Return ID value of the last INSERT operation.
+     * @see Database#lastInsertId
+     */
+    public function insert_id()
+    {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->insert_id()" is deprecated, use "$database->lastInsertId()" instead!');
+
+        return $this->lastInsertId();
+    }
+
+    /**
+     * Returns the number of rows of the last executed statement.
+     * @deprecated 3.1.0:4.0.0 Switched to native PDO method.
+     *             Please use the PHP class <a href="https://secure.php.net/manual/en/class.pdostatement.php">\PDOStatement</a>
+     *             and the method <a href="https://secure.php.net/manual/en/pdostatement.rowcount.php">rowCount</a> instead.
+     * @param \PDOStatement $pdoStatement An object of the class \PDOStatement. This should be set if multiple
+     *                                    rows where selected and other sql statements are also send to the database.
+     * @return int|null Return the number of rows of the result of the sql statement.
+     * @see <a href="https://secure.php.net/manual/en/pdostatement.rowcount.php">\PDOStatement::rowCount</a>
+     */
+    public function num_rows(\PDOStatement $pdoStatement = null)
+    {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->num_rows()" is deprecated, use "$this->pdoStatement->rowCount()" instead!');
+
+        // if pdo statement is committed then fetch this object
+        if ($pdoStatement instanceof \PDOStatement)
+        {
+            return $pdoStatement->rowCount();
+        }
+        // if no pdo statement was committed then take the one from the last query
+        if ($this->pdoStatement instanceof \PDOStatement)
+        {
+            return $this->pdoStatement->rowCount();
+        }
+
+        return null;
+    }
+
+    /**
+     * Method gets all columns and their properties from the database table.
+     * @deprecated 3.2.0:4.0.0 Switch to new methods (getTableColumnsProperties(), getTableColumns()).
+     * @param string $table                Name of the database table for which the columns should be shown.
+     * @param bool   $showColumnProperties If this is set to **false** only the column names were returned.
+     * @return array<string,array<string,mixed>>|array<int,string> Returns an array with each column and their properties if $showColumnProperties is set to **true**.
+     */
+    public function showColumns($table, $showColumnProperties = true)
+    {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->showColumns()" is deprecated, use "$database->getTableColumnsProperties()" or "$database->getTableColumns()" instead!');
+
+        if ($showColumnProperties)
+        {
+            // returns all columns with their properties of the table
+            return $this->getTableColumnsProperties($table);
+        }
+
+        // returns only the column names of the table.
+        return $this->getTableColumns($table);
     }
 }

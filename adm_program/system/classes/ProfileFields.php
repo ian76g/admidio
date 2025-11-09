@@ -121,7 +121,7 @@ class ProfileFields
         }
 
         // if id-field not exists then return zero
-        if (StringUtils::strContains($column, '_id'))
+        if (admStrContains($column, '_id'))
         {
             return 0;
         }
@@ -235,10 +235,10 @@ class ProfileFields
                     {
                         // if value is imagefile or imageurl then show image
                         if ($usfType === 'RADIO_BUTTON'
-                        && (StringUtils::strContains($listValue, '.png', false) || StringUtils::strContains($listValue, '.jpg', false)))
+                        && (admStrContains(admStrToLower($listValue), '.png') || admStrContains(admStrToLower($listValue), '.jpg')))
                         {
                             // if there is imagefile and text separated by | then explode them
-                            if (StringUtils::strContains($listValue, '|'))
+                            if (admStrContains($listValue, '|'))
                             {
                                 list($listValueImage, $listValueText) = explode('|', $listValue);
                             }
@@ -254,7 +254,7 @@ class ProfileFields
                             try
                             {
                                 // create html for optionbox entry
-                                if (strValidCharacters($listValueImage, 'url') && StringUtils::strStartsWith($listValueImage, 'http', false))
+                                if (strValidCharacters($listValueImage, 'url') && admStrStartsWith(admStrToLower($listValueImage), 'http'))
                                 {
                                     $listValue = '<img class="admidio-icon-info" src="' . $listValueImage . '" title="' . $listValueText . '" alt="' . $listValueText . '" />';
                                 }
@@ -291,7 +291,7 @@ class ProfileFields
                         $displayValue = $value;
 
                         // trim "http://", "https://", "//"
-                        if (StringUtils::strContains($displayValue, '//'))
+                        if (admStrContains($displayValue, '//'))
                         {
                             $displayValue = substr($displayValue, strpos($displayValue, '//') + 2);
                         }
@@ -324,7 +324,7 @@ class ProfileFields
                 }
 
                 // replace a variable in url with user value
-                if (StringUtils::strContains($usfUrl, '#user_content#'))
+                if (admStrContains($usfUrl, '#user_content#'))
                 {
                     $htmlValue = str_replace('#user_content#', $value, $htmlValue);
                 }
@@ -620,7 +620,7 @@ class ProfileFields
                     break;
                 case 'EMAIL':
                     // Email darf nur gueltige Zeichen enthalten und muss einem festen Schema entsprechen
-                    if (!$this->noValueCheck && !strValidCharacters($fieldValue, 'email'))
+                    if (false && !$this->noValueCheck && !strValidCharacters(admStrToLower($fieldValue), 'email'))
                     {
                         return false;
                     }

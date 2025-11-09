@@ -46,11 +46,11 @@ function prepareReceivers($receiversString)
     $receiversSplit = explode('|', $receiversString);
     foreach ($receiversSplit as $receivers)
     {
-        if (StringUtils::strStartsWith($receivers, 'list '))
+        if (admStrStartsWith($receivers, 'list '))
         {
             $receiverNames .= '; ' . substr($receivers, 5);
         }
-        elseif (StringUtils::strContains($receivers, ':'))
+        elseif (admStrContains($receivers, ':'))
         {
             $moduleMessages = new ModuleMessages();
             $receiverNames .= '; ' . $moduleMessages->msgGroupNameSplit($receivers);

@@ -173,7 +173,7 @@ if ($getMsgType === TableMessage::MESSAGE_TYPE_EMAIL)
         foreach ($postTo as $value)
         {
             // check if role or user is given
-            if (StringUtils::strContains($value, ':'))
+            if (admStrContains($value, ':'))
             {
                 $moduleMessages = new ModuleMessages();
                 $group = $moduleMessages->msgGroupSplit($value);
@@ -464,7 +464,7 @@ if ($getMsgType === TableMessage::MESSAGE_TYPE_EMAIL)
         '#message#'  => $postBody,
         '#receiver#' => $receiverName
     );
-    $emailTemplate = StringUtils::strMultiReplace($emailTemplate, $replaces);
+    $emailTemplate = admStrMultiReplace($emailTemplate, $replaces);
 
     // prepare body of email with note of sender and homepage
     $email->setSenderInText($postName, $receiverName);

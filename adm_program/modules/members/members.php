@@ -63,6 +63,11 @@ $membersAdministrationMenu->addItem(
     $gL10n->get('MEM_CREATE_USER'), 'add.png'
 );
 
+$membersAdministrationMenu->addItem(
+    'menu_item_create_kids', ADMIDIO_URL.FOLDER_MODULES.'/addkids/addkids.php',
+    'Kinder anlegen', 'add.png'
+);
+
 if($gSettingsManager->getBool('profile_log_edit_fields'))
 {
     // show link to view profile field change history
@@ -77,7 +82,7 @@ if($gSettingsManager->getBool('members_show_all_users'))
 {
     $navbarForm = new HtmlForm('navbar_show_all_users_form', '', $page, array('type' => 'navbar', 'setFocus' => false));
     $navbarForm->addCheckbox('mem_show_all', $gL10n->get('MEM_SHOW_ALL_USERS'), $flagShowMembers, array('helpTextIdLabel' => 'MEM_SHOW_USERS_DESC'));
-    $membersAdministrationMenu->addForm($navbarForm->show());
+    $membersAdministrationMenu->addForm($navbarForm->show(false));
 }
 
 $membersAdministrationMenu->addItem('menu_item_extras', '', $gL10n->get('SYS_MORE_FEATURES'), '', 'right');

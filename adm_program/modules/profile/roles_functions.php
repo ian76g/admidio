@@ -93,9 +93,11 @@ function getFormerRolesFromDatabase($userId)
  * @param string        $htmlListId
  * @param User          $user
  * @param \PDOStatement $roleStatement
+ * @param int           $countRole     deprecated
+ * @param bool          $directOutput  deprecated
  * @return string
  */
-function getRoleMemberships($htmlListId, User $user, \PDOStatement $roleStatement)
+function getRoleMemberships($htmlListId, User $user, \PDOStatement $roleStatement, $countRole = 0, $directOutput = false)
 {
     global $gDb, $gL10n, $gCurrentUser, $gSettingsManager;
 
@@ -225,7 +227,7 @@ function getRoleMemberships($htmlListId, User $user, \PDOStatement $roleStatemen
                             'btn_send_'.$memberId, $gL10n->get('SYS_OK'),
                             array('class' => 'button-membership-period-form', 'data-admidio' => $memberId)
                         );
-                        $roleMemHTML .= $form->show();
+                        $roleMemHTML .= $form->show(false);
                     $roleMemHTML .= '</div></li>
                     <li class="list-group-item" id="member_info_'.$memberId.'_Content" style="display: none;">';
                         // show information about user who creates the recordset and changed it
@@ -246,6 +248,13 @@ function getRoleMemberships($htmlListId, User $user, \PDOStatement $roleStatemen
     else
     {
         $roleMemHTML .= '</ul>';
+    }
+
+    // deprecated
+    if($directOutput)
+    {
+        echo $roleMemHTML;
+        return '';
     }
 
     return $roleMemHTML;
